@@ -58,6 +58,45 @@ public final class Eat extends ElementCollision {
         return false;
     }
 
+    protected final ElementResult doDetermineColliderResult(
+            final ElementCollisionData collider,
+            final ElementCollisionData collideInto
+    ) {
+        final ElementCollision other = collideInto.getCollision();
+        if (other == Eat.INSTANCE) {
+            return new Destroy();
+        }
+        else if (
+                (other == Bounce.INSTANCE) ||
+                (other == Eaten.INSTANCE) ||
+                (other == Push.INSTANCE) ||
+                (other == Stick.INSTANCE)
+        ) {
+            return new Move(
+                    collider.getDirection(),
+                    new Field.Position(collider.getDirection().getDeltaX(), collider.getDirection().getDeltaY())
+            );
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    protected final ElementResult doDetermineCollideIntoResult(
+            final ElementCollisionData collider,
+            final ElementCollisionData collideInto
+    ) {
+        final ElementCollision other = collideInto.getCollision();
+        if (
+                (other == Bounce.INSTANCE) ||
+                (other == Eat.INSTANCE) ||
+                (other == Eaten.INSTANCE) ||
+                (other == Push.INSTANCE) ||
+                (other == Stick.INSTANCE)
+        ) {
+            return new Destroy();
+        }
+        throw new UnsupportedOperationException();
+    }
+
     private Eat() {
     }
 }

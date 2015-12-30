@@ -178,7 +178,6 @@ public final class Field {
             }
 
             Position position = (Position) o;
-
             return (x == position.x) && (y == position.y);
         }
 
