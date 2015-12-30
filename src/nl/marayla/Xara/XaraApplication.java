@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  * <p>TODO
  *  <li>Implement dynamic-dynamic collision behavior</li>
+ *  <li>Introduce Field.RelativePosition as derived from ConstantDirection</li>
  *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>
  *  <li>Check all Field.TopLinePosition's with new FigureGameElement</li>
  *  <li>Remove render-method from Field</li>
