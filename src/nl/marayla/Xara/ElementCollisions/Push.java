@@ -3,64 +3,27 @@ package nl.marayla.Xara.ElementCollisions;
 import nl.marayla.Xara.Field;
 
 // TODO Ensure that push does not push elements on top of each other
-/*
- *  PUSH: <code>dynamic</code> pushes <code>static</code>
- *      PUSH will only be executed if field that <code>static</code> will be pushed into, is empty
- *      <code>static</code> moves in direction of <code>dynamic</code>
- *      <code>dynamic</code> moves to position of <code>static</code>
- */
 public final class Push extends ElementCollision {
     public static final ElementCollision INSTANCE = new Push();
 
-    @Override
-    public ElementCollisionData.List handleCollision(
-        final ElementCollisionData collider,
-        final ElementCollisionData collideInto
+    protected final ElementResult doDetermineElement1Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
-        ElementCollisionData.List list = ElementCollisionData.List.getInstance();
-
-        collideInto.setAction(Field.Action.MOVE);
-        collideInto.setDirection(collider.getDirection());
-        list.add(collideInto);
-
-        ElementCollisionData data = ElementCollisionData.createInstance(
-                Field.Action.ADD,
-                collider.getIndex(),
-                collider.getElement(),
-                collider.getDirection(),
-                collider.getCollision()
-        );
-        list.add(data);
-
-        collider.setAction(Field.Action.MOVE);
-        list.add(collider);
-
-        return list;
-/*
-        int elementNextIndex = Field.calculateIndex(staticIndex, collider.direction);
-        if (Field.getElement(elementNextIndex) == null) {
-            Field.moveElement(staticIndex, elementNextIndex);
-            Field.addElement(staticIndex, collider.element, collider.direction);
-        }
-        else {
-            Field.addElement(collider.index, collider.element, collider.direction);
-        }
-        */
-    }
-
-    protected final ElementResult doDetermineColliderResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
-    ) {
-        final ElementCollision other = collideInto.getCollision();
+        final ElementCollision other = element2.getCollision();
         if (other == Push.INSTANCE) {
-            return new Keep(collider.getDirection());
+            return new Keep(element1.getDirection());
         }
         else if ((other == Bounce.INSTANCE) || (other == Eaten.INSTANCE) || (other == Stick.INSTANCE)) {
-            return new Move(
-                    collider.getDirection(),
-                    new Field.Position(collider.getDirection().getDeltaX(), collider.getDirection().getDeltaY())
-            );
+            if (element1.getDynamic()) {
+                return new Move(
+                        element1.getDirection(),
+                        new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
+                );
+            }
+            else {
+                return new Keep(element1.getDirection());
+            }
         }
         else if (other == Eat.INSTANCE) {
             return new Destroy();
@@ -68,33 +31,38 @@ public final class Push extends ElementCollision {
         throw new UnsupportedOperationException();
     }
 
-    protected final ElementResult doDetermineCollideIntoResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
+    protected final ElementResult doDetermineElement2Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
-        final ElementCollision other = collideInto.getCollision();
+        final ElementCollision other = element2.getCollision();
         if (other == Push.INSTANCE) {
-            return new Keep(collideInto.getDirection());
+            return new Keep(element2.getDirection());
         }
         else if (other == Bounce.INSTANCE) {
             return new Move(
-                    collideInto.getDirection().reverse(),
-                    new Field.Position(collider.getDirection().getDeltaX(), collider.getDirection().getDeltaY())
+                    element2.getDirection().reverse(),
+                    new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
             );
         }
         else if (other == Eat.INSTANCE) {
-            return new Move(
-                    collideInto.getDirection(),
-                    new Field.Position(collideInto.getDirection().getDeltaX(), collideInto.getDirection().getDeltaY())
-            );
+            if (element2.getDynamic()) {
+                return new Move(
+                        element2.getDirection(),
+                        new Field.Position(element2.getDirection().getDeltaX(), element2.getDirection().getDeltaY())
+                );
+            }
+            else {
+                return new Keep(element2.getDirection());
+            }
         }
         else if (other == Eaten.INSTANCE) {
             return new Destroy();
         }
         else if (other == Stick.INSTANCE) {
             return new Move(
-                    collideInto.getDirection(),
-                    new Field.Position(collider.getDirection().getDeltaX(), collider.getDirection().getDeltaY())
+                    element2.getDirection(),
+                    new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
             );
         }
         throw new UnsupportedOperationException();

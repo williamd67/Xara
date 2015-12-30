@@ -36,31 +36,44 @@ public final class Field {
         NONE {
             @Override
             public void execute(final ElementCollisionData data) {
+//                System.out.println("None " + data.getIndex());
             }
         },
         ADD {
             @Override
             public void execute(final ElementCollisionData data) {
+//                System.out.println("Add " + data.getIndex());
                 addElement(data.getIndex(), data.getElement(), data.getDirection());
-            }
-        },
-        REMOVE {
-            @Override
-            public void execute(final ElementCollisionData data) {
-                removeElement(data.getIndex());
-            }
-        },
-        MOVE {
-            @Override
-            public void execute(final ElementCollisionData data) {
-                int nextIndex = calculateIndex(data.getIndex(), data.getDirection());
-                if (getElement(nextIndex) == null) {
-                    moveElement(data.getIndex(), nextIndex);
-                }
             }
         };
 
         public abstract void execute(final ElementCollisionData data);
+    }
+
+    @Contract("_, _, null -> fail")
+    private static void executeAddAfterCollision(
+            final int cellIndex,
+            final GameElement element,
+            final ElementCollision.ElementResult result
+    ) {
+        //noinspection StatementWithEmptyBody
+        if (result instanceof ElementCollision.Destroy) {
+            // nothing to do
+        }
+        else if (result instanceof ElementCollision.Keep) {
+//            System.out.println("Keep ++ Add " + cellIndex);
+            addElement(cellIndex, element, result.getNextDirection());
+        }
+        else if (result instanceof ElementCollision.Move) {
+            int nextIndex = calculateIndex(cellIndex, result.getRelativePosition());
+            if (getElement(nextIndex) == null) {
+//                System.out.println("Move ++ Add " + nextIndex);
+                addElement(nextIndex, element, result.getNextDirection());
+            }
+        }
+        else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /*
@@ -608,6 +621,7 @@ public final class Field {
 
         // Check if it collides with another dynamic element (remove it from collisions-list in case it does)
         ConstantDirection staticDirection = Direction.STATIC;
+        boolean staticCollider = false;
         if (collisions.remove((Integer) staticCellIndex)) {
             // Check if staticElement collides with dynamicElement (directions are opposite)
             final DynamicCellContent staticCell = dynamicCells.get(staticCellIndex);
@@ -622,6 +636,9 @@ public final class Field {
                     return;
                 }
             }
+            else {
+                staticCollider = true;
+            }
         }
 
         // Determine collision type
@@ -634,7 +651,8 @@ public final class Field {
                 dynamicCellIndex,
                 dynamicElement,
                 dynamicDirection,
-                dynamicCollision
+                dynamicCollision,
+                true
         );
 
         // Store information for collision-element
@@ -643,7 +661,8 @@ public final class Field {
                 staticCellIndex,
                 staticElement,
                 staticDirection,
-                staticCollision
+                staticCollision,
+                staticCollider
         );
 
         // Todo: improve way that classes are connected it is strange to use one of the collisions to call this general method
@@ -655,7 +674,7 @@ public final class Field {
         // Determine if static will be moved by collision
         final int nextStaticCellIndex = calculateIndex(
                 staticCellIndex,
-                collisionResult.getCollideIntoResult().getRelativePosition()
+                collisionResult.getElement2Result().getRelativePosition()
         );
 
         // Check if static moves
@@ -671,15 +690,11 @@ public final class Field {
         final ElementEffect effect = levelGamePlay.determineElementEffect(dynamicCollision, dynamicElement, staticElement);
 
         // Handle collision
-        ElementCollisionData.List list = dynamicCollision.handleCollision(
-                dynamicElementCollisionData,
-                staticElementCollisionData
-        );
-        for (ElementCollisionData data : list) {
-            data.getAction().execute(data);
-            ElementCollisionData.releaseInstance(data);
-        }
-        ElementCollisionData.List.releaseInstance(list);
+        // dynamic is already removed so no need to remove again
+        removeElement(staticCellIndex);
+        // TODO: add test for that position dynamic != static
+        executeAddAfterCollision(staticCellIndex, staticElement, collisionResult.getElement2Result());
+        executeAddAfterCollision(dynamicCellIndex, dynamicElement, collisionResult.getElement1Result());
 
         effect.execute();
     }

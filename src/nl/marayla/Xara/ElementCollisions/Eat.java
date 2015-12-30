@@ -2,42 +2,14 @@ package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
 
-
-/*
- * EAT: Element <code>dynamic</code> eats <code>static</code>
- *      <code>static</code> is destroyed
- *      <code>dynamic</code> moves to position of <code>static</code>
- */
 public final class Eat extends ElementCollision {
     public static final ElementCollision INSTANCE = new Eat();
-    @Override
-    public ElementCollisionData.List handleCollision(
-        final ElementCollisionData collider,
-        final ElementCollisionData collideInto
+
+    protected final ElementResult doDetermineElement1Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
-        ElementCollisionData.List list = ElementCollisionData.List.getInstance();
-
-        ElementCollisionData data = ElementCollisionData.createInstance(
-                Field.Action.REMOVE,
-                collideInto.getIndex(),
-                null,
-                Field.Direction.STATIC,
-                null
-        );
-        list.add(data);
-
-        collider.setAction(Field.Action.ADD);
-        collider.setIndex(collideInto.getIndex());
-        list.add(collider);
-
-        return list;
-    }
-
-    protected final ElementResult doDetermineColliderResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
-    ) {
-        final ElementCollision other = collideInto.getCollision();
+        final ElementCollision other = element2.getCollision();
         if (other == Eat.INSTANCE) {
             return new Destroy();
         }
@@ -47,19 +19,24 @@ public final class Eat extends ElementCollision {
                 (other == Push.INSTANCE) ||
                 (other == Stick.INSTANCE)
         ) {
-            return new Move(
-                    collider.getDirection(),
-                    new Field.Position(collider.getDirection().getDeltaX(), collider.getDirection().getDeltaY())
-            );
+            if (element1.getDynamic()) {
+                return new Move(
+                        element1.getDirection(),
+                        new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
+                );
+            }
+            else {
+                return new Keep(element1.getDirection());
+            }
         }
         throw new UnsupportedOperationException();
     }
 
-    protected final ElementResult doDetermineCollideIntoResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
+    protected final ElementResult doDetermineElement2Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
-        final ElementCollision other = collideInto.getCollision();
+        final ElementCollision other = element2.getCollision();
         if (
                 (other == Bounce.INSTANCE) ||
                 (other == Eat.INSTANCE) ||

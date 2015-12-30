@@ -30,10 +30,11 @@ public class ElementCollisionData {
             final int index,
             final GameElement element,
             final Field.ConstantDirection direction,
-            final ElementCollision collision
+            final ElementCollision collision,
+            final boolean dynamic
     )
     {
-        return getInstance().set(action, index, element, direction, collision);
+        return getInstance().set(action, index, element, direction, collision, dynamic);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -69,6 +70,10 @@ public class ElementCollisionData {
         return collision;
     }
 
+    public final boolean getDynamic() {
+        return dynamic;
+    }
+
     public final void setAction(final Field.Action action) {
         this.action = action;
     }
@@ -90,11 +95,18 @@ public class ElementCollisionData {
     }
 
     private ElementCollisionData set(final ElementCollisionData other) {
-        return set(other.getAction(), other.getIndex(), other.getElement(), other.getDirection(), other.getCollision());
+        return set(
+                other.getAction(),
+                other.getIndex(),
+                other.getElement(),
+                other.getDirection(),
+                other.getCollision(),
+                other.getDynamic()
+        );
     }
 
     private ElementCollisionData reset() {
-        return set(Field.Action.NONE, 0, null, Field.Direction.STATIC, null);
+        return set(Field.Action.NONE, 0, null, Field.Direction.STATIC, null, false);
     }
 
     private ElementCollisionData set(
@@ -102,13 +114,15 @@ public class ElementCollisionData {
             final int index,
             final GameElement element,
             final Field.ConstantDirection direction,
-            final ElementCollision collision
+            final ElementCollision collision,
+            final boolean dynamic
     ) {
         this.action = action;
         this.index = index;
         this.element = element;
         this.direction = direction;
         this.collision = collision;
+        this.dynamic = dynamic;
 
         return this;
     }
@@ -118,6 +132,7 @@ public class ElementCollisionData {
     private GameElement element;
     private Field.ConstantDirection direction;
     private ElementCollision collision;
+    private boolean dynamic;
 
     private ElementCollisionData() {
         reset();

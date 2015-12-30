@@ -3,11 +3,14 @@ package nl.marayla.Xara.test;
 import nl.marayla.Xara.ElementCollisions.*;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
+import org.jetbrains.annotations.Contract;
 
 abstract class MockFuse extends Fuse {
     public MockFuse(final SetupFusionElement setupFusionElement) {
         this.setupFusionElement = setupFusionElement;
     }
+
+    @Contract("_, _ -> !null")
     @Override
     protected final GameElement createFusionElement(
         final GameElement dynamicElement,
@@ -15,6 +18,7 @@ abstract class MockFuse extends Fuse {
     ) {
         return new MockElementRenderer(dynamicElement);
     }
+
     @Override
     protected final ElementCollisionData.List addFusion(
         final GameElement fusion,
@@ -24,32 +28,37 @@ abstract class MockFuse extends Fuse {
         setupFusionElement.execute(fusion, collider, collideInto);
         return doAddFusion(fusion, collider, collideInto);
     }
+
     protected abstract ElementCollisionData.List doAddFusion(
         final GameElement fusion,
         final ElementCollisionData collider,
         final ElementCollisionData collideInto
     );
 
-    protected final ElementResult doDetermineColliderResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
+    @Contract("_, _ -> fail")
+    protected final ElementResult doDetermineElement1Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
         throw new UnsupportedOperationException();
     }
 
-    protected final ElementResult doDetermineCollideIntoResult(
-            final ElementCollisionData collider,
-            final ElementCollisionData collideInto
+    @Contract("_, _ -> fail")
+    protected final ElementResult doDetermineElement2Result(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
     ) {
         throw new UnsupportedOperationException();
     }
 
     private SetupFusionElement setupFusionElement;
 }
+
 class MockStaticFuse extends MockFuse {
     public MockStaticFuse(final SetupFusionElement setupFusionElement) {
         super(setupFusionElement);
     }
+
     @Override
     protected final ElementCollisionData.List doAddFusion(
         final GameElement fusion,
@@ -62,16 +71,19 @@ class MockStaticFuse extends MockFuse {
                 collideInto.getIndex(),
                 fusion,
                 Field.Direction.STATIC,
-                null
+                null,
+                false
         );
         list.add(data);
         return list;
     }
 }
+
 class MockDynamicFuse extends MockFuse {
     public MockDynamicFuse(final SetupFusionElement setupFusionElement) {
         super(setupFusionElement);
     }
+
     @Override
     protected final ElementCollisionData.List doAddFusion(
         final GameElement fusion,
@@ -84,7 +96,8 @@ class MockDynamicFuse extends MockFuse {
                 collideInto.getIndex(),
                 fusion,
                 collider.getDirection(),
-                null
+                null,
+                false
         );
         list.add(data);
         return list;

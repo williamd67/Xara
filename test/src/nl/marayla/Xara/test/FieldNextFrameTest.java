@@ -61,32 +61,14 @@ public class FieldNextFrameTest extends TestCase {
 
     // First and last-column will be skipped (will be filled later by fillColumn)
     private void fillRow(final int row) {
-        int cellIndex = (row * FIELD_SIZE);
         for (int column = 1; column < (FIELD_SIZE - 1); column++) {
-            cellIndex++;
-            ElementCollisionData data = ElementCollisionData.createInstance(
-                    Field.Action.ADD,
-                    cellIndex,
-                    LevelElements.BLOCK,
-                    Field.Direction.STATIC,
-                    null
-            );
-            // TODO add data to list
+            Field.addStaticElement(LevelElements.BLOCK, new Field.Position(column, row));
         }
     }
 
     private void fillColumn(final int column) {
-        int cellIndex = column;
         for (int row = 0; row < FIELD_SIZE; row++) {
-            ElementCollisionData data = ElementCollisionData.createInstance(
-                    Field.Action.ADD,
-                    cellIndex,
-                    LevelElements.BLOCK,
-                    Field.Direction.STATIC,
-                    null
-            );
-            // TODO add data to list
-            cellIndex += FIELD_SIZE;
+            Field.addStaticElement(LevelElements.BLOCK, new Field.Position(column, row));
         }
     }
 

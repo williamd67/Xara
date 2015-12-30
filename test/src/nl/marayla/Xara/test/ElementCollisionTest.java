@@ -38,7 +38,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
         return current;
     }
 
-    private void addExpectedRenderAreasStatic(
+    private void addExpectedRenderPositionsStatic(
         final LevelElements collisionType,
         final MockElementRenderer element,
         final Field.ConstantPosition position,
@@ -132,7 +132,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
     ) {
         MockElementRenderer element = new MockElementRenderer();
         addElement(element);
-        addExpectedRenderAreasStatic(
+        addExpectedRenderPositionsStatic(
             collisionType,
             element,
             position,
@@ -574,14 +574,13 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
             NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
 
-        for (Field.Direction direction : Field.Direction.values()) {
-            System.out.println("debug 1: " + direction.toString());
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
 
+        Field.Direction [] directions = { Direction.LEFT, Direction.RIGHT };
+        for (Field.Direction direction : directions) { // Field.Direction.values()) {
             if (direction == Field.Direction.STATIC) {
                 continue;
             }
-
-            Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
 
             int offsetX = direction.getDeltaX() * (numberOfCallsAfterCollision + 1);
             int offsetY = direction.getDeltaY() * (numberOfCallsAfterCollision + 1);
@@ -598,7 +597,10 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
                 case LEFT_UP:
                 case UP:
                 case RIGHT_UP:
-                    inside  = LevelElements.BOUNCE; // LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    do {
+                        // everything except EAT, FUSE_STATIC and FUSE_DYNAMIC // TODO: remove after proper implementation of FUSE_xxxx
+                        inside = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    } while ((inside == LevelElements.EAT) || (inside == LevelElements.FUSE_STATIC) || (inside == LevelElements.FUSE_DYNAMIC));
                     insideNumberOfPositions = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION;
                     outside = LevelElements.EAT;
                     outsideNumberOfPositions = NUMBER_OF_RENDER_CALLS;
@@ -609,8 +611,10 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
                 case LEFT_DOWN:
                     inside  = LevelElements.EAT;
                     insideNumberOfPositions = NUMBER_OF_RENDER_CALLS;
-                    // LevelElements.values()[random.nextInt(LevelElements.values().length)];
-                    outside = LevelElements.BOUNCE;
+                    do {
+                        // everything except EAT, FUSE_STATIC and FUSE_DYNAMIC // TODO: remove after proper implementation of FUSE_xxxx
+                        outside = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    } while ((outside == LevelElements.EAT) || (outside == LevelElements.FUSE_STATIC) || (outside == LevelElements.FUSE_DYNAMIC));
                     outsideNumberOfPositions = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION;
                     break;
                 case STATIC:
@@ -632,9 +636,10 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
                 outside,
                 outsideNumberOfPositions
             );
-            render(NUMBER_OF_RENDER_CALLS);
-            verify();
         }
+
+        render(NUMBER_OF_RENDER_CALLS);
+        verify();
     }
 
     /**
@@ -665,7 +670,10 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
                 case LEFT_UP:
                 case UP:
                 case RIGHT_UP:
-                    inside  = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    do {
+                        // everything except EATEN, FUSE_STATIC and FUSE_DYNAMIC // TODO: remove after proper implementation of FUSE_xxxx
+                        inside = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    } while ((inside == LevelElements.EATEN) || (inside == LevelElements.FUSE_STATIC) || (inside == LevelElements.FUSE_DYNAMIC));
                     insideNumberOfPositions = NUMBER_OF_RENDER_CALLS;
                     outside = LevelElements.EATEN;
                     outsideNumberOfPositions = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION;
@@ -676,7 +684,10 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
                 case LEFT_DOWN:
                     inside  = LevelElements.EATEN;
                     insideNumberOfPositions = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION;
-                    outside = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    do {
+                        // everything except EATEN, FUSE_STATIC and FUSE_DYNAMIC // TODO: remove after proper implementation of FUSE_xxxx
+                        outside = LevelElements.values()[random.nextInt(LevelElements.values().length)];
+                    } while ((outside == LevelElements.EATEN) || (outside == LevelElements.FUSE_STATIC) || (outside == LevelElements.FUSE_DYNAMIC));
                     outsideNumberOfPositions = NUMBER_OF_RENDER_CALLS;
                     break;
                 case STATIC:
