@@ -401,18 +401,17 @@ public final class Field {
         }
     }
 
-    // TODO make private
-    public static int calculateIndex(final int index, final Field.ConstantDirection direction) {
+    private static int calculateIndex(final int index, final ConstantPosition relativePosition) {
         int result;
         switch (topLinePosition) {
             case NONE:
             case TOP:
             case BOTTOM:
-                result = index + direction.getDeltaX() + (direction.getDeltaY() * topLineSize);
+                result = index + relativePosition.getX() + (relativePosition.getY() * topLineSize);
                 break;
             case LEFT:
             case RIGHT:
-                result = index + direction.getDeltaY() + (direction.getDeltaX() * topLineSize);
+                result = index + relativePosition.getY() + (relativePosition.getX() * topLineSize);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -424,6 +423,11 @@ public final class Field {
             result -= cells.length;
         }
         return result;
+    }
+
+    // TODO make private
+    public static int calculateIndex(final int index, final ConstantDirection direction) {
+        return calculateIndex(index, new Position(direction.getDeltaX(), direction.getDeltaY()));
     }
 
     public static void initialize(
@@ -650,9 +654,9 @@ public final class Field {
         );
 
         // Determine if static will be moved by collision
-        final int nextStaticCellIndex = dynamicCollision.determineNextStaticCellIndex(
-                dynamicElementCollisionData,
-                staticElementCollisionData
+        final int nextStaticCellIndex = calculateIndex(
+                staticCellIndex,
+                collisionResult.getCollideIntoResult().getRelativePosition()
         );
 
         // Check if static moves

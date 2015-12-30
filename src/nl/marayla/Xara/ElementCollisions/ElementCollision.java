@@ -4,7 +4,7 @@ import nl.marayla.Xara.Field;
 import org.jetbrains.annotations.Contract;
 
 public abstract class ElementCollision {
-    protected interface ElementResult {
+    public interface ElementResult {
         Field.ConstantPosition getRelativePosition();
         Field.ConstantDirection getNextDirection();
     }
