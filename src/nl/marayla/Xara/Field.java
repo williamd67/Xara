@@ -425,8 +425,7 @@ public final class Field {
         return result;
     }
 
-    // TODO make private
-    public static int calculateIndex(final int index, final ConstantDirection direction) {
+    private static int calculateIndex(final int index, final ConstantDirection direction) {
         return calculateIndex(index, new Position(direction.getDeltaX(), direction.getDeltaY()));
     }
 

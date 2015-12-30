@@ -1,7 +1,6 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
-import org.jetbrains.annotations.Contract;
 
 // TODO Ensure that push does not push elements on top of each other
 /*
@@ -47,24 +46,6 @@ public final class Push extends ElementCollision {
             Field.addElement(collider.index, collider.element, collider.direction);
         }
         */
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected final boolean staticKeep(final ElementCollision collision) {
-        return (collision == Eat.INSTANCE) || (collision == Eaten.INSTANCE) || (collision == Push.INSTANCE);
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected final boolean staticMoveStaticDirection(final ElementCollision collision) {
-        return false;
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected  final boolean staticMoveDynamicDirection(final ElementCollision collision) {
-        return (collision == Bounce.INSTANCE) || (collision == Stick.INSTANCE);
     }
 
     protected final ElementResult doDetermineColliderResult(

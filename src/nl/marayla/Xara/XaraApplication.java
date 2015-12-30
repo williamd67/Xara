@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
  *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>
  *  <li>Check all Field.TopLinePosition's with new FigureGameElement</li>
  *  <li>Remove render-method from Field</li>
- *  <li>Abstract staticKeep, etc. from ElementCollision</li>
  *  <li>Reconnect Widener again and solve issues</li>
  *  <li>Solve two (figure)GameElements connected to each other moving together</li>
  *  <li>Introduce ball</li>

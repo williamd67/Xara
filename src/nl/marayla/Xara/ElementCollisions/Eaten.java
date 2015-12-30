@@ -20,29 +20,6 @@ public final class Eaten extends ElementCollision {
         return ElementCollisionData.List.getInstance();
     }
 
-    @Contract(pure = true)
-    @Override
-    protected final boolean staticKeep(final ElementCollision collision) {
-        return (collision == Bounce.INSTANCE);
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected final boolean staticMoveStaticDirection(final ElementCollision collision) {
-        return (
-                (collision == Eat.INSTANCE) ||
-                (collision == Eaten.INSTANCE) ||
-                (collision == Push.INSTANCE) ||
-                (collision == Stick.INSTANCE)
-        );
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected  final boolean staticMoveDynamicDirection(final ElementCollision collision) {
-        return false;
-    }
-
     protected final ElementResult doDetermineColliderResult(
             final ElementCollisionData collider,
             final ElementCollisionData collideInto

@@ -3,7 +3,6 @@ package nl.marayla.Xara.test;
 import nl.marayla.Xara.ElementCollisions.*;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
-import org.jetbrains.annotations.Contract;
 
 abstract class MockFuse extends Fuse {
     public MockFuse(final SetupFusionElement setupFusionElement) {
@@ -30,30 +29,6 @@ abstract class MockFuse extends Fuse {
         final ElementCollisionData collider,
         final ElementCollisionData collideInto
     );
-
-    @Contract(pure = true)
-    @Override
-    protected final boolean staticKeep(final ElementCollision collision) {
-        return (
-                (collision == Bounce.INSTANCE) ||
-                (collision == Eat.INSTANCE) ||
-                (collision == Eaten.INSTANCE) ||
-                (collision == Push.INSTANCE) ||
-                (collision == Stick.INSTANCE)
-        );
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected final boolean staticMoveStaticDirection(final ElementCollision collision) {
-        return false;
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected  final boolean staticMoveDynamicDirection(final ElementCollision collision) {
-        return false;
-    }
 
     protected final ElementResult doDetermineColliderResult(
             final ElementCollisionData collider,

@@ -1,7 +1,6 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
-import org.jetbrains.annotations.Contract;
 
 
 /*
@@ -32,30 +31,6 @@ public final class Eat extends ElementCollision {
         list.add(collider);
 
         return list;
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected final boolean staticKeep(final ElementCollision collision) {
-        return (
-                (collision == Bounce.INSTANCE) ||
-                (collision == Eat.INSTANCE) ||
-                (collision == Eaten.INSTANCE) ||
-                (collision == Push.INSTANCE) ||
-                (collision == Stick.INSTANCE)
-        );
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected final boolean staticMoveStaticDirection(final ElementCollision collision) {
-        return false;
-    }
-
-    @Contract(value = "_ -> false", pure = true)
-    @Override
-    protected  final boolean staticMoveDynamicDirection(final ElementCollision collision) {
-        return false;
     }
 
     protected final ElementResult doDetermineColliderResult(
