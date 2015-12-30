@@ -55,6 +55,20 @@ abstract class MockFuse extends Fuse {
         return false;
     }
 
+    protected final ElementResult doDetermineColliderResult(
+            final ElementCollisionData collider,
+            final ElementCollisionData collideInto
+    ) {
+        throw new UnsupportedOperationException();
+    }
+
+    protected final ElementResult doDetermineCollideIntoResult(
+            final ElementCollisionData collider,
+            final ElementCollisionData collideInto
+    ) {
+        throw new UnsupportedOperationException();
+    }
+
     private SetupFusionElement setupFusionElement;
 }
 class MockStaticFuse extends MockFuse {

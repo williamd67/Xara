@@ -643,6 +643,12 @@ public final class Field {
                 staticCollision
         );
 
+        // Todo: improve way that classes are connected it is strange to use one of the collisions to call this general method
+        ElementCollision.CollisionResult collisionResult = dynamicCollision.determineCollisionResult(
+                dynamicElementCollisionData,
+                staticElementCollisionData
+        );
+
         // Determine if static will be moved by collision
         final int nextStaticCellIndex = dynamicCollision.determineNextStaticCellIndex(
                 dynamicElementCollisionData,
