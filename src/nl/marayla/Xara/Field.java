@@ -50,10 +50,9 @@ public final class Field {
         public abstract void execute(final ElementCollisionData data);
     }
 
-    @Contract("_, _, null -> fail")
+    @Contract("_, null -> fail")
     private static void executeAddAfterCollision(
             final int cellIndex,
-            final GameElement element,
             final ElementCollision.ElementCollisionResult result
     ) {
         //noinspection StatementWithEmptyBody
@@ -62,13 +61,13 @@ public final class Field {
         }
         else if (result instanceof ElementCollision.Keep) {
 //            System.out.println("Keep ++ Add " + cellIndex);
-            addElement(cellIndex, element, result.getNextDirection());
+            addElement(cellIndex, result.getNextElement(), result.getNextDirection());
         }
         else if (result instanceof ElementCollision.Move) {
             int nextIndex = calculateIndex(cellIndex, result.getRelativePosition());
             if (getElement(nextIndex) == null) {
 //                System.out.println("Move ++ Add " + nextIndex);
-                addElement(nextIndex, element, result.getNextDirection());
+                addElement(nextIndex, result.getNextElement(), result.getNextDirection());
             }
         }
         else {
@@ -687,14 +686,15 @@ public final class Field {
             }
         }
 
+        // TODO: determine ElementEffect based on CollisionResult
         final ElementEffect effect = levelGamePlay.determineElementEffect(dynamicCollision, dynamicElement, staticElement);
 
         // Handle collision
         // dynamic is already removed so no need to remove again
         removeElement(staticCellIndex);
         // TODO: add test for that position dynamic != static
-        executeAddAfterCollision(staticCellIndex, staticElement, collisionResult.getElement2Result());
-        executeAddAfterCollision(dynamicCellIndex, dynamicElement, collisionResult.getElement1Result());
+        executeAddAfterCollision(staticCellIndex, collisionResult.getElement2Result());
+        executeAddAfterCollision(dynamicCellIndex, collisionResult.getElement1Result());
 
         effect.execute();
     }
