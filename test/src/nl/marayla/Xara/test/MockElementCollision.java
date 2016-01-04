@@ -36,7 +36,7 @@ abstract class MockFuse extends Fuse {
     );
 
     @Contract("_, _ -> fail")
-    protected final ElementResult doDetermineElement1Result(
+    protected final ElementCollisionResult doDetermineElement1Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
@@ -44,7 +44,7 @@ abstract class MockFuse extends Fuse {
     }
 
     @Contract("_, _ -> fail")
-    protected final ElementResult doDetermineElement2Result(
+    protected final ElementCollisionResult doDetermineElement2Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {

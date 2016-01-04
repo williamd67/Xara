@@ -54,7 +54,7 @@ public final class Field {
     private static void executeAddAfterCollision(
             final int cellIndex,
             final GameElement element,
-            final ElementCollision.ElementResult result
+            final ElementCollision.ElementCollisionResult result
     ) {
         //noinspection StatementWithEmptyBody
         if (result instanceof ElementCollision.Destroy) {

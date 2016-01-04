@@ -6,7 +6,7 @@ import nl.marayla.Xara.Field;
 public final class Push extends ElementCollision {
     public static final ElementCollision INSTANCE = new Push();
 
-    protected final ElementResult doDetermineElement1Result(
+    protected final ElementCollisionResult doDetermineElement1Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
@@ -31,7 +31,7 @@ public final class Push extends ElementCollision {
         throw new UnsupportedOperationException();
     }
 
-    protected final ElementResult doDetermineElement2Result(
+    protected final ElementCollisionResult doDetermineElement2Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {

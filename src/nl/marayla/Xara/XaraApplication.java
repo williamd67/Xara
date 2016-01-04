@@ -15,7 +15,10 @@ import org.jetbrains.annotations.Nullable;
  * <p>Design:
  * </p>
  * <p>TODO
+ *  <li>Fix fusion implementation</li>
  *  <li>Implement dynamic-dynamic collision behavior</li>
+ *  <li>Fix collision issues with push</li>
+ *  <li>Fix collision issues when static is moved into other element</li>
  *  <li>Introduce Field.RelativePosition as derived from ConstantDirection</li>
  *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>
  *  <li>Check all Field.TopLinePosition's with new FigureGameElement</li>

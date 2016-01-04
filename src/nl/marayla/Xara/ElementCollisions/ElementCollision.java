@@ -4,12 +4,12 @@ import nl.marayla.Xara.Field;
 import org.jetbrains.annotations.Contract;
 
 public abstract class ElementCollision {
-    public interface ElementResult {
+    public interface ElementCollisionResult {
         Field.ConstantPosition getRelativePosition();
         Field.ConstantDirection getNextDirection();
     }
 
-    public final class Destroy implements ElementResult {
+    public final class Destroy implements ElementCollisionResult {
         @Contract(pure = true)
         public final Field.ConstantPosition getRelativePosition() {
             return Field.Position.ORIGIN;
@@ -21,7 +21,7 @@ public abstract class ElementCollision {
         }
     }
 
-    private abstract class ChangedDirection implements ElementResult {
+    private abstract class ChangedDirection implements ElementCollisionResult {
         public ChangedDirection(final Field.ConstantDirection nextDirection) {
             this.nextDirection = nextDirection;
         }
@@ -60,21 +60,21 @@ public abstract class ElementCollision {
     }
 
     public final class CollisionResult {
-        public CollisionResult(final ElementResult element1Result, final ElementResult element2Result) {
+        public CollisionResult(final ElementCollisionResult element1Result, final ElementCollisionResult element2Result) {
             this.element1Result = element1Result;
             this.element2Result = element2Result;
         }
 
-        public final ElementResult getElement1Result() {
+        public final ElementCollisionResult getElement1Result() {
             return element1Result;
         }
 
-        public final ElementResult getElement2Result() {
+        public final ElementCollisionResult getElement2Result() {
             return element2Result;
         }
 
-        private ElementResult element1Result;
-        private ElementResult element2Result;
+        private ElementCollisionResult element1Result;
+        private ElementCollisionResult element2Result;
     }
 
     @Contract("_, _ -> !null")
@@ -88,7 +88,7 @@ public abstract class ElementCollision {
         );
     }
 
-    protected final ElementResult determineElement1Result(
+    protected final ElementCollisionResult determineElement1Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
@@ -100,7 +100,7 @@ public abstract class ElementCollision {
         }
     }
 
-    protected final ElementResult determineElement2Result(
+    protected final ElementCollisionResult determineElement2Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
@@ -112,12 +112,12 @@ public abstract class ElementCollision {
         }
     }
 
-    protected abstract ElementResult doDetermineElement1Result(
+    protected abstract ElementCollisionResult doDetermineElement1Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     );
 
-    protected abstract ElementResult doDetermineElement2Result(
+    protected abstract ElementCollisionResult doDetermineElement2Result(
             final ElementCollisionData element1,
             final ElementCollisionData element2
     );
