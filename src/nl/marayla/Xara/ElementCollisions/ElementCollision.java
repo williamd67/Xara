@@ -1,15 +1,37 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
+import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 
 public abstract class ElementCollision {
     public interface ElementCollisionResult {
+        GameElement getNextElement();
         Field.ConstantPosition getRelativePosition();
         Field.ConstantDirection getNextDirection();
     }
 
-    public final class Destroy implements ElementCollisionResult {
+    private abstract class ElementCollisionResultWithNextElement implements ElementCollisionResult {
+        public ElementCollisionResultWithNextElement(final GameElement nextElement) {
+            this.nextElement = nextElement;
+        }
+
+        @Contract(pure = true)
+        public final GameElement getNextElement() {
+            return nextElement;
+        }
+
+        public abstract Field.ConstantPosition getRelativePosition();
+        public abstract Field.ConstantDirection getNextDirection();
+
+        private GameElement nextElement;
+    }
+
+    public final class Destroy extends ElementCollisionResultWithNextElement {
+        public Destroy(final GameElement nextElement) {
+            super(nextElement);
+        }
+
         @Contract(pure = true)
         public final Field.ConstantPosition getRelativePosition() {
             return Field.Position.ORIGIN;
@@ -21,8 +43,9 @@ public abstract class ElementCollision {
         }
     }
 
-    private abstract class ChangedDirection implements ElementCollisionResult {
-        public ChangedDirection(final Field.ConstantDirection nextDirection) {
+    private abstract class ChangedDirection extends ElementCollisionResultWithNextElement {
+        public ChangedDirection(final GameElement nextElement, final Field.ConstantDirection nextDirection) {
+            super(nextElement);
             this.nextDirection = nextDirection;
         }
 
@@ -36,8 +59,8 @@ public abstract class ElementCollision {
     }
 
     public final class Keep extends ChangedDirection {
-        public Keep(final Field.ConstantDirection nextDirection) {
-            super(nextDirection);
+        public Keep(final GameElement nextElement, final Field.ConstantDirection nextDirection) {
+            super(nextElement, nextDirection);
         }
 
         @Contract(pure = true)
@@ -47,8 +70,12 @@ public abstract class ElementCollision {
     }
 
     public final class Move extends ChangedDirection {
-        public Move(final Field.ConstantDirection nextDirection, final Field.ConstantPosition relativePosition) {
-            super(nextDirection);
+        public Move(
+                final GameElement nextElement,
+                final Field.ConstantDirection nextDirection,
+                final Field.ConstantPosition relativePosition
+        ) {
+            super(nextElement, nextDirection);
             this.relativePosition = relativePosition;
         }
 

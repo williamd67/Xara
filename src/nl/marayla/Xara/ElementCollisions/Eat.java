@@ -11,7 +11,7 @@ public final class Eat extends ElementCollision {
     ) {
         final ElementCollision other = element2.getCollision();
         if (other == Eat.INSTANCE) {
-            return new Destroy();
+            return new Destroy(element1.getElement());
         }
         else if (
                 (other == Bounce.INSTANCE) ||
@@ -21,12 +21,13 @@ public final class Eat extends ElementCollision {
         ) {
             if (element1.getDynamic()) {
                 return new Move(
+                        element1.getElement(),
                         element1.getDirection(),
                         new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
                 );
             }
             else {
-                return new Keep(element1.getDirection());
+                return new Keep(element1.getElement(), element1.getDirection());
             }
         }
         throw new UnsupportedOperationException();
@@ -44,7 +45,7 @@ public final class Eat extends ElementCollision {
                 (other == Push.INSTANCE) ||
                 (other == Stick.INSTANCE)
         ) {
-            return new Destroy();
+            return new Destroy(element2.getElement());
         }
         throw new UnsupportedOperationException();
     }

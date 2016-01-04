@@ -12,21 +12,22 @@ public final class Push extends ElementCollision {
     ) {
         final ElementCollision other = element2.getCollision();
         if (other == Push.INSTANCE) {
-            return new Keep(element1.getDirection());
+            return new Keep(element1.getElement(), element1.getDirection());
         }
         else if ((other == Bounce.INSTANCE) || (other == Eaten.INSTANCE) || (other == Stick.INSTANCE)) {
             if (element1.getDynamic()) {
                 return new Move(
+                        element1.getElement(),
                         element1.getDirection(),
                         new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
                 );
             }
             else {
-                return new Keep(element1.getDirection());
+                return new Keep(element1.getElement(), element1.getDirection());
             }
         }
         else if (other == Eat.INSTANCE) {
-            return new Destroy();
+            return new Destroy(element1.getElement());
         }
         throw new UnsupportedOperationException();
     }
@@ -37,10 +38,11 @@ public final class Push extends ElementCollision {
     ) {
         final ElementCollision other = element2.getCollision();
         if (other == Push.INSTANCE) {
-            return new Keep(element2.getDirection());
+            return new Keep(element2.getElement(), element2.getDirection());
         }
         else if (other == Bounce.INSTANCE) {
             return new Move(
+                    element2.getElement(),
                     element2.getDirection().reverse(),
                     new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
             );
@@ -48,19 +50,21 @@ public final class Push extends ElementCollision {
         else if (other == Eat.INSTANCE) {
             if (element2.getDynamic()) {
                 return new Move(
+                        element2.getElement(),
                         element2.getDirection(),
                         new Field.Position(element2.getDirection().getDeltaX(), element2.getDirection().getDeltaY())
                 );
             }
             else {
-                return new Keep(element2.getDirection());
+                return new Keep(element2.getElement(), element2.getDirection());
             }
         }
         else if (other == Eaten.INSTANCE) {
-            return new Destroy();
+            return new Destroy(element2.getElement());
         }
         else if (other == Stick.INSTANCE) {
             return new Move(
+                    element2.getElement(),
                     element2.getDirection(),
                     new Field.Position(element1.getDirection().getDeltaX(), element1.getDirection().getDeltaY())
             );

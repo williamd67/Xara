@@ -17,7 +17,7 @@ public final class Eaten extends ElementCollision {
                 (other == Push.INSTANCE) ||
                 (other == Stick.INSTANCE)
         ) {
-            return new Destroy();
+            return new Destroy(element1.getElement());
         }
         throw new UnsupportedOperationException();
     }
@@ -28,19 +28,20 @@ public final class Eaten extends ElementCollision {
     ) {
         final ElementCollision other = element2.getCollision();
         if (other == Eaten.INSTANCE) {
-            return new Destroy();
+            return new Destroy(element2.getElement());
         } else if ((other == Eat.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
             if (element2.getDynamic()) {
                 return new Move(
+                        element2.getElement(),
                         element2.getDirection(),
                         new Field.Position(element2.getDirection().getDeltaX(), element2.getDirection().getDeltaY())
                 );
             }
             else {
-                return new Keep(element2.getDirection());
+                return new Keep(element2.getElement(), element2.getDirection());
             }
         } else if (other == Bounce.INSTANCE) {
-            return new Keep(element2.getDirection().reverse());
+            return new Keep(element2.getElement(), element2.getDirection().reverse());
         }
         throw new UnsupportedOperationException();
     }
