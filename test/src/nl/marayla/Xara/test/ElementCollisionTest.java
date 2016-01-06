@@ -2,17 +2,12 @@ package nl.marayla.Xara.test;
 
 import java.util.Random;
 
-import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.Field.Direction;
 import nl.marayla.Xara.GameElements.GameElement;
 
-interface SetupFusionElement {
-    void execute(GameElement fusion, ElementCollisionData collider, ElementCollisionData collideInto);
-}
-
-public class ElementCollisionTest extends BaseCollisionFieldTest implements SetupFusionElement {
+public class ElementCollisionTest extends BaseCollisionFieldTest {
     private void addExpectedRenderPositionsStatic(
         final MockElementRenderer element,
         final Field.ConstantPosition position,
@@ -88,13 +83,13 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
         switch(collisionType) {
             case EAT:
             case PUSH:
+            case FUSE_STATIC:
+            case FUSE_DYNAMIC:
                 numberOfDynamicPositions = numberOfRenderCalls;
                 break;
             case EATEN:
             case BOUNCE:
             case STICK:
-            case FUSE_STATIC:
-            case FUSE_DYNAMIC:
                 numberOfDynamicPositions = numberOfRenderCallsBeforeCollision;
                 break;
             default:
@@ -203,40 +198,8 @@ public class ElementCollisionTest extends BaseCollisionFieldTest implements Setu
 
     @Override
     protected final void doSetupElementCollisionResolver(final ElementCollisionResolver collisionResolver) {
-        collisionResolver.addElementCollision(new MockStaticFuse(this), LevelElements.FUSE_STATIC);
-        collisionResolver.addElementCollision(
-            new MockDynamicFuse(this),
-            LevelElements.FUSE_DYNAMIC
-        );
-    }
-
-    @Override
-    public final void execute(
-        final GameElement fusion,
-        final ElementCollisionData collider,
-        final ElementCollisionData collideInto
-    ) {
-        if (fusion instanceof MockElementRenderer) {
-            MockElementRenderer element = (MockElementRenderer) fusion;
-            addElement(element);
-            int numberOfPositions = NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION;
-            Field.Position position = new Field.Position(
-                    (collideInto.getIndex() % (FIELD_SIZE + 2)) - 1,
-                    (collideInto.getIndex() / (FIELD_SIZE + 2)) - 1
-            );
-            for (int i = 0; i < numberOfPositions; i++) {
-                if (element.ordinal() == LevelElements.FUSE_STATIC.ordinal()) {
-                    element.addExpectedRenderPosition(position);
-                }
-                else if (element.ordinal() == LevelElements.FUSE_DYNAMIC.ordinal()) {
-                    element.addExpectedRenderPosition(position);
-                    position.set(
-                            position.getX() + collider.getDirection().getDeltaX(),
-                            position.getY() + collider.getDirection().getDeltaY()
-                    );
-                }
-            }
-        }
+        collisionResolver.addElementCollision(new MockFuse(), LevelElements.FUSE_STATIC);
+        collisionResolver.addElementCollision(new MockFuse(), LevelElements.FUSE_DYNAMIC);
     }
 
     public final void testNoCollision() {

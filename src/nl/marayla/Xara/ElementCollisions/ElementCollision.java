@@ -119,6 +119,7 @@ public abstract class ElementCollision {
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
+        assert (element1.getDynamic() || element2.getDynamic());
         try {
             return element1.getCollision().doDetermineElement1Result(element1, element2);
         }
@@ -131,6 +132,7 @@ public abstract class ElementCollision {
             final ElementCollisionData element1,
             final ElementCollisionData element2
     ) {
+        assert (element1.getDynamic() || element2.getDynamic());
         try {
             return element1.getCollision().doDetermineElement2Result(element1, element2);
         }
