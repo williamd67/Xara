@@ -26,7 +26,6 @@ public class ElementCollisionData {
         }
 
     public static ElementCollisionData createInstance(
-            final Field.Action action,
             final int index,
             final GameElement element,
             final Field.ConstantDirection direction,
@@ -34,7 +33,7 @@ public class ElementCollisionData {
             final boolean dynamic
     )
     {
-        return getInstance().set(action, index, element, direction, collision, dynamic);
+        return getInstance().set(index, element, direction, collision, dynamic);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -48,10 +47,6 @@ public class ElementCollisionData {
             pool[poolFree++] = data;
         }
         // else do nothing; carbage collector will clean-up
-    }
-
-    public final Field.Action getAction() {
-        return action;
     }
 
     public final int getIndex() {
@@ -74,10 +69,6 @@ public class ElementCollisionData {
         return dynamic;
     }
 
-    public final void setAction(final Field.Action action) {
-        this.action = action;
-    }
-
     public final void setIndex(final int index) {
         this.index = index;
     }
@@ -96,7 +87,6 @@ public class ElementCollisionData {
 
     private ElementCollisionData set(final ElementCollisionData other) {
         return set(
-                other.getAction(),
                 other.getIndex(),
                 other.getElement(),
                 other.getDirection(),
@@ -106,18 +96,16 @@ public class ElementCollisionData {
     }
 
     private ElementCollisionData reset() {
-        return set(Field.Action.NONE, 0, null, Field.Direction.STATIC, null, false);
+        return set(0, null, Field.Direction.STATIC, null, false);
     }
 
     private ElementCollisionData set(
-            final Field.Action action,
             final int index,
             final GameElement element,
             final Field.ConstantDirection direction,
             final ElementCollision collision,
             final boolean dynamic
     ) {
-        this.action = action;
         this.index = index;
         this.element = element;
         this.direction = direction;
@@ -127,7 +115,6 @@ public class ElementCollisionData {
         return this;
     }
 
-    private Field.Action action;
     private int index;
     private GameElement element;
     private Field.ConstantDirection direction;

@@ -29,26 +29,6 @@ import org.jetbrains.annotations.Contract;
 //          ???
 //  Contains 2D-array of cells
 public final class Field {
-    /*
-     * Action
-     */
-    public enum Action {
-        NONE {
-            @Override
-            public void execute(final ElementCollisionData data) {
-//                System.out.println("None " + data.getIndex());
-            }
-        },
-        ADD {
-            @Override
-            public void execute(final ElementCollisionData data) {
-//                System.out.println("Add " + data.getIndex());
-                addElement(data.getIndex(), data.getElement(), data.getDirection());
-            }
-        };
-
-        public abstract void execute(final ElementCollisionData data);
-    }
 
     @Contract("_, null -> fail")
     private static void executeAddAfterCollision(
@@ -646,7 +626,6 @@ public final class Field {
 
         // Store information for dynamic-element
         ElementCollisionData dynamicElementCollisionData = ElementCollisionData.createInstance(
-                Action.NONE,
                 dynamicCellIndex,
                 dynamicElement,
                 dynamicDirection,
@@ -656,7 +635,6 @@ public final class Field {
 
         // Store information for collision-element
         ElementCollisionData staticElementCollisionData = ElementCollisionData.createInstance(
-                Action.NONE,
                 staticCellIndex,
                 staticElement,
                 staticDirection,

@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
  * <p>Design:
  * </p>
  * <p>TODO
- *  <li>Fix fusion implementation</li>
  *  <li>Implement dynamic-dynamic collision behavior</li>
  *  <li>Fix collision issues with push</li>
  *  <li>Fix collision issues when static is moved into other element</li>
