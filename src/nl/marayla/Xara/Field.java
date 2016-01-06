@@ -664,8 +664,7 @@ public final class Field {
             }
         }
 
-        // TODO: determine ElementEffect based on CollisionResult
-        final ElementEffect effect = levelGamePlay.determineElementEffect(dynamicCollision, dynamicElement, staticElement);
+        final ElementEffect effect = levelGamePlay.determineElementEffect(collisionResult, dynamicElement, staticElement);
 
         // Handle collision
         // dynamic is already removed so no need to remove again

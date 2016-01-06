@@ -29,7 +29,7 @@ class MockLevelGamePlay implements LevelGamePlay {
 
     @Override
     public ElementEffect determineElementEffect(
-        final ElementCollision collision,
+        final ElementCollision.CollisionResult collisionResult,
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {

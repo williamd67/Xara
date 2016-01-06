@@ -1,7 +1,6 @@
 package nl.marayla.Xara.Levels;
 
 import nl.marayla.Xara.Field;
-import nl.marayla.Xara.Renderer.ConstantRectangle;
 import nl.marayla.Xara.Renderer.RenderData;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
@@ -14,7 +13,7 @@ public interface LevelGamePlay {
         GameElement staticElement
     );
     ElementEffect determineElementEffect(
-        ElementCollision collision,
+        ElementCollision.CollisionResult collisionResult,
         GameElement dynamicElement,
         GameElement staticElement
     );
