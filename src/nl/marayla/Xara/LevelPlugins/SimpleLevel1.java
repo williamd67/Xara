@@ -2,17 +2,12 @@ package nl.marayla.Xara.LevelPlugins;
 
 import java.util.Random;
 
+import nl.marayla.Xara.ElementCollisions.*;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.Figure;
-import nl.marayla.Xara.FigureInfo;
-import nl.marayla.Xara.LevelRenderer; // TODO Move to levels
 import nl.marayla.Xara.LevelRendererCreator; // TODO Move to Levels
 import nl.marayla.Xara.Renderer.Color;
 import nl.marayla.Xara.SimpleLevelRenderer; // TODO Move to levels
-import nl.marayla.Xara.ElementCollisions.Bounce;
-import nl.marayla.Xara.ElementCollisions.ElementCollision;
-import nl.marayla.Xara.ElementCollisions.Eat;
-import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.ElementEffects.CompositeElementEffect;
 import nl.marayla.Xara.ElementEffects.NoEffect;
@@ -53,7 +48,7 @@ public class SimpleLevel1 extends Level {
 
     @Override
     public final ElementEffect determineElementEffect(
-        final ElementCollision.CollisionResult collisionResult,
+        final CollisionResult collisionResult,
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {

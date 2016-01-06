@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import nl.marayla.Xara.ElementCollisions.CollisionResult;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
@@ -642,8 +643,7 @@ public final class Field {
                 staticCollider
         );
 
-        // Todo: improve way that classes are connected it is strange to use one of the collisions to call this general method
-        ElementCollision.CollisionResult collisionResult = dynamicCollision.determineCollisionResult(
+        CollisionResult collisionResult = CollisionResult.determineCollisionResult(
                 dynamicElementCollisionData,
                 staticElementCollisionData
         );
