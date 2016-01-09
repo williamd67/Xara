@@ -31,6 +31,83 @@ import org.jetbrains.annotations.Contract;
 //  Contains 2D-array of cells
 public final class Field {
 
+    public interface PlacingAfterCollision {
+        void execute();
+    }
+
+    public class PlacingNone implements PlacingAfterCollision {
+        @Override
+        public final void execute() {
+        }
+    }
+
+    public class PlacingOne implements PlacingAfterCollision {
+        protected final class PlacingData {
+            public PlacingData(final int index, final GameElement element, final ConstantDirection direction) {
+                this.index = index;
+                this.element = element;
+                this.direction = direction;
+            }
+
+            public final int getIndex() {
+                return index;
+            }
+
+            public final GameElement getElement() {
+                return element;
+            }
+
+            public final ConstantDirection getDirection() {
+                return direction;
+            }
+
+            private int index;
+            private GameElement element;
+            private ConstantDirection direction;
+        }
+
+        public PlacingOne(
+                final int placingIndex,
+                final GameElement placingElement,
+                final ConstantDirection placingDirection
+        ) {
+            placingData = new PlacingData(placingIndex, placingElement, placingDirection);
+        }
+
+        @Override
+        public void execute() {
+            assert getElement(placingData.getIndex()) == null;
+            addElement(placingData.getIndex(), placingData.getElement(), placingData.getDirection());
+        }
+
+        private PlacingData placingData;
+    }
+
+    public class PlacingBoth extends PlacingOne {
+        public PlacingBoth(
+                final int placingIndexOne,
+                final GameElement placingElementOne,
+                final ConstantDirection placingDirectionOne,
+                final int placingIndexTwo,
+                final GameElement placingElementTwo,
+                final ConstantDirection placingDirectionTwo
+        ) {
+            super(placingIndexOne, placingElementOne, placingDirectionOne);
+
+            placingData = new PlacingData(placingIndexTwo, placingElementTwo, placingDirectionTwo);
+        }
+
+        @Override
+        public void execute() {
+            super.execute();
+
+            assert getElement(placingData.getIndex()) == null;
+            addElement(placingData.getIndex(), placingData.getElement(), placingData.getDirection());
+        }
+
+        private PlacingData placingData;
+    }
+
     @Contract("_, null -> fail")
     private static void placeElementAfterCollision(
             final int cellIndex,
