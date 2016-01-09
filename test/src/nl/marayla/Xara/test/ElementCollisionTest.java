@@ -678,6 +678,52 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         verify();
     }
 
+    public final void testDynamicCircleWithCollision() {
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+
+        final int numberOfRenderCallsBeforeCollision = 2;
+        final int numberOfRenderCalls = 3;
+
+        // Element to DOWN
+        setupDynamicElement(
+                new Field.Position(6, 7),
+                LevelElements.EAT,
+                Direction.DOWN,
+                numberOfRenderCalls,
+                numberOfRenderCalls
+        );
+
+        // Element to LEFT
+        setupDynamicElement(
+                new Field.Position(4, 6),
+                LevelElements.EATEN,
+                Direction.LEFT,
+                numberOfRenderCalls,
+                numberOfRenderCalls
+        );
+
+        // Element to UP
+        setupDynamicElement(
+                new Field.Position(5, 4),
+                LevelElements.EATEN,
+                Direction.UP,
+                numberOfRenderCalls,
+                numberOfRenderCalls
+        );
+
+        // Element to RIGHT_DOWN
+        setupDynamicElement(
+                new Field.Position(6, 6),
+                LevelElements.EATEN,
+                Direction.RIGHT_DOWN,
+                numberOfRenderCalls,
+                numberOfRenderCallsBeforeCollision
+        );
+
+        render(numberOfRenderCalls);
+        verify();
+    }
+
     private static final Field.ConstantPosition INITIAL_POINT = new Field.Position(FIELD_SIZE / 2, FIELD_SIZE / 2);
     private static final int NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION = NUMBER_OF_RENDER_CALLS / 2;
     private final Random random = new Random(43);

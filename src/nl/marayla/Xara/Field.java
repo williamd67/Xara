@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Contract;
 public final class Field {
 
     @Contract("_, null -> fail")
-    private static void executeAddAfterCollision(
+    private static void placeElementAfterCollision(
             final int cellIndex,
             final ElementCollision.ElementCollisionResult result
     ) {
@@ -41,14 +41,20 @@ public final class Field {
             // nothing to do
         }
         else if (result instanceof ElementCollision.Keep) {
-//            System.out.println("Keep ++ Add " + cellIndex);
-            addElement(cellIndex, result.getNextElement(), result.getNextDirection());
+            if (getElement(cellIndex) == null) {
+                addElement(cellIndex, result.getNextElement(), result.getNextDirection());
+            }
+            else {
+                handlePlacingCollision(cellIndex, result);
+            }
         }
         else if (result instanceof ElementCollision.Move) {
             int nextIndex = calculateIndex(cellIndex, result.getRelativePosition());
             if (getElement(nextIndex) == null) {
-//                System.out.println("Move ++ Add " + nextIndex);
                 addElement(nextIndex, result.getNextElement(), result.getNextDirection());
+            }
+            else {
+                handlePlacingCollision(nextIndex, result);
             }
         }
         else {
@@ -670,8 +676,8 @@ public final class Field {
         // dynamic is already removed so no need to remove again
         removeElement(staticCellIndex);
         // TODO: add test for that position dynamic != static
-        executeAddAfterCollision(staticCellIndex, collisionResult.getElement2Result());
-        executeAddAfterCollision(dynamicCellIndex, collisionResult.getElement1Result());
+        placeElementAfterCollision(staticCellIndex, collisionResult.getElement2Result());
+        placeElementAfterCollision(dynamicCellIndex, collisionResult.getElement1Result());
 
         effect.execute();
     }
@@ -683,6 +689,15 @@ public final class Field {
     ) {
         cells[nextDynamicCellIndex] = dynamicElement;
         dynamicCells.put(nextDynamicCellIndex, dynamicCell);
+    }
+
+    // Element would be placed on top of another element
+    private static void handlePlacingCollision(
+            final int cellIndex,
+            final ElementCollision.ElementCollisionResult result
+    ) {
+        // Placing should always be successfull as all dynamic elements will be handled one after each other
+        assert false;
     }
 
     private static void resize(final ConstantSize externalSize) {
