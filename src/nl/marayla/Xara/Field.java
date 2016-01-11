@@ -35,13 +35,13 @@ public final class Field {
         void execute();
     }
 
-    public class PlacingNone implements PlacingAfterCollision {
+    public static class PlacingNone implements PlacingAfterCollision {
         @Override
         public final void execute() {
         }
     }
 
-    public class PlacingOne implements PlacingAfterCollision {
+    public static class PlacingOne implements PlacingAfterCollision {
         protected final class PlacingData {
             public PlacingData(final int index, final GameElement element, final ConstantDirection direction) {
                 this.index = index;
@@ -67,9 +67,9 @@ public final class Field {
         }
 
         public PlacingOne(
-                final int placingIndex,
-                final GameElement placingElement,
-                final ConstantDirection placingDirection
+            final int placingIndex,
+            final GameElement placingElement,
+            final ConstantDirection placingDirection
         ) {
             placingData = new PlacingData(placingIndex, placingElement, placingDirection);
         }
@@ -83,14 +83,14 @@ public final class Field {
         private PlacingData placingData;
     }
 
-    public class PlacingBoth extends PlacingOne {
+    public static class PlacingBoth extends PlacingOne {
         public PlacingBoth(
-                final int placingIndexOne,
-                final GameElement placingElementOne,
-                final ConstantDirection placingDirectionOne,
-                final int placingIndexTwo,
-                final GameElement placingElementTwo,
-                final ConstantDirection placingDirectionTwo
+            final int placingIndexOne,
+            final GameElement placingElementOne,
+            final ConstantDirection placingDirectionOne,
+            final int placingIndexTwo,
+            final GameElement placingElementTwo,
+            final ConstantDirection placingDirectionTwo
         ) {
             super(placingIndexOne, placingElementOne, placingDirectionOne);
 
@@ -110,8 +110,8 @@ public final class Field {
 
     @Contract("_, null -> fail")
     private static void placeElementAfterCollision(
-            final int cellIndex,
-            final ElementCollision.ElementCollisionResult result
+        final int cellIndex,
+        final ElementCollision.ElementCollisionResult result
     ) {
         //noinspection StatementWithEmptyBody
         if (result instanceof ElementCollision.Destroy) {
@@ -144,6 +144,7 @@ public final class Field {
      */
     public interface ConstantSize {
         int getWidth();
+
         int getHeight();
     }
 
@@ -207,6 +208,7 @@ public final class Field {
      */
     public interface ConstantPosition {
         int getX();
+
         int getY();
     }
 
@@ -275,9 +277,13 @@ public final class Field {
      */
     public interface ConstantDirection {
         int getDeltaX();
+
         int getDeltaY();
+
         ConstantDirection reverse();
+
         ConstantDirection combine(final ConstantDirection direction);
+
         ConstantDirection extract(final ConstantDirection direction);
     }
 
@@ -314,16 +320,16 @@ public final class Field {
         @Override
         public final ConstantDirection combine(final ConstantDirection direction) {
             return determineDirectionBasedOnDeltaXandDeltaY(
-                    deltaX + direction.getDeltaX(),
-                    deltaY + direction.getDeltaY()
+                deltaX + direction.getDeltaX(),
+                deltaY + direction.getDeltaY()
             );
         }
 
         @Override
         public final ConstantDirection extract(final ConstantDirection direction) {
             return determineDirectionBasedOnDeltaXandDeltaY(
-                    (deltaX == direction.getDeltaX()) ? 0 : deltaX, // if x-direction equal extract else do not change
-                    (deltaY == direction.getDeltaY()) ? 0 : deltaY  // if y-direction equal extract else do not change
+                (deltaX == direction.getDeltaX()) ? 0 : deltaX, // if x-direction equal extract else do not change
+                (deltaY == direction.getDeltaY()) ? 0 : deltaY  // if y-direction equal extract else do not change
             );
         }
 
@@ -336,8 +342,7 @@ public final class Field {
         }
 
         @Contract(pure = true)
-        private static Direction determineDirectionBasedOnDeltaXandDeltaY(final int deltaX, final int deltaY)
-        {
+        private static Direction determineDirectionBasedOnDeltaXandDeltaY(final int deltaX, final int deltaY) {
             if (deltaX < 0) { // x => LEFT
                 if (deltaY < 0) { // y  => UP
                     return LEFT_UP;
@@ -410,8 +415,7 @@ public final class Field {
             return this.direction.extract(direction);
         }
 
-        public final void update (final ConstantDirection direction)
-        {
+        public final void update(final ConstantDirection direction) {
             this.direction = direction;
         }
 
@@ -422,7 +426,11 @@ public final class Field {
      * TopLinePosition
      */
     public enum TopLinePosition {
-        NONE, TOP, BOTTOM, LEFT, RIGHT
+        NONE,
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
     }
 
     /*
@@ -455,6 +463,7 @@ public final class Field {
     /**
      * removeElement will remove an element in field.
      * It is allowed to point at an empty (= null) element.
+     *
      * @param index is the element-index that determines which element to remove
      */
     private static void removeElement(final int index) {
@@ -501,7 +510,8 @@ public final class Field {
         return result;
     }
 
-    private static int calculateIndex(final int index, final ConstantDirection direction) {
+    // TODO: determine if this method should be static
+    public static int calculateIndex(final int index, final ConstantDirection direction) {
         return calculateIndex(index, new Position(direction.getDeltaX(), direction.getDeltaY()));
     }
 
@@ -652,16 +662,16 @@ public final class Field {
 
     /**
      * DONE Issue1 : Watch out for GameElement that does not move (Direction.STATIC)
-     *      -> ignore collision handling
+     * -> ignore collision handling
      * DONE Issue2 : DynamicElements can collide in circle -> move all and no collision handling
      * TODO Issue3 : DynamicElement can point at each other and in that case pass each other
-     *      without collision -> not handled right now
+     * without collision -> not handled right now
      * TODO Issue4 : DynamicElement can end-up in same cell (started from different places)
-     *      -> most difficult to solve -> not handled right now
+     * -> most difficult to solve -> not handled right now
      *
-     * @param collisions contains list of all collisions that still have to be handled
+     * @param collisions       contains list of all collisions that still have to be handled
      * @param dynamicCellIndex is index of cell that is moving and which possible collision is handled
-     * @param levelGamePlay gameplay of this level
+     * @param levelGamePlay    gameplay of this level
      */
     private static void doHandleCollision(
         final LinkedList<Integer> collisions,
@@ -689,7 +699,7 @@ public final class Field {
             // Check if staticElement collides with dynamicElement (directions are opposite)
             final DynamicCellContent staticCell = dynamicCells.get(staticCellIndex);
             staticDirection = staticCell.direction;
-            if(staticDirection.reverse() != dynamicDirection) {
+            if (staticDirection.reverse() != dynamicDirection) {
                 doHandleCollision(collisions, staticCellIndex, levelGamePlay);
 
                 // element can be moved by handling its collision, so determine element again
@@ -705,36 +715,39 @@ public final class Field {
         }
 
         // Determine collision type
-        final ElementCollision dynamicCollision = levelGamePlay.determineElementCollision(dynamicElement, staticElement);
+        final ElementCollision dynamicCollision = levelGamePlay.determineElementCollision(
+            dynamicElement,
+            staticElement
+        );
         final ElementCollision staticCollision = levelGamePlay.determineElementCollision(staticElement, dynamicElement);
 
         // Store information for dynamic-element
         ElementCollisionData dynamicElementCollisionData = ElementCollisionData.createInstance(
-                dynamicCellIndex,
-                dynamicElement,
-                dynamicDirection,
-                dynamicCollision,
-                true
+            dynamicCellIndex,
+            dynamicElement,
+            dynamicDirection,
+            dynamicCollision,
+            true
         );
 
         // Store information for collision-element
         ElementCollisionData staticElementCollisionData = ElementCollisionData.createInstance(
-                staticCellIndex,
-                staticElement,
-                staticDirection,
-                staticCollision,
-                staticCollider
+            staticCellIndex,
+            staticElement,
+            staticDirection,
+            staticCollision,
+            staticCollider
         );
 
         CollisionResult collisionResult = CollisionResult.determineCollisionResult(
-                dynamicElementCollisionData,
-                staticElementCollisionData
+            dynamicElementCollisionData,
+            staticElementCollisionData
         );
 
         // Determine if static will be moved by collision
         final int nextStaticCellIndex = calculateIndex(
-                staticCellIndex,
-                collisionResult.getElement2Result().getRelativePosition()
+            staticCellIndex,
+            collisionResult.getElement2Result().getRelativePosition()
         );
 
         // Check if static moves
@@ -747,7 +760,11 @@ public final class Field {
             }
         }
 
-        final ElementEffect effect = levelGamePlay.determineElementEffect(collisionResult, dynamicElement, staticElement);
+        final ElementEffect effect = levelGamePlay.determineElementEffect(
+            collisionResult,
+            dynamicElement,
+            staticElement
+        );
 
         // Handle collision
         // dynamic is already removed so no need to remove again
@@ -770,8 +787,8 @@ public final class Field {
 
     // Element would be placed on top of another element
     private static void handlePlacingCollision(
-            final int cellIndex,
-            final ElementCollision.ElementCollisionResult result
+        final int cellIndex,
+        final ElementCollision.ElementCollisionResult result
     ) {
         // Placing should always be successfull as all dynamic elements will be handled one after each other
         assert false;
@@ -814,6 +831,7 @@ public final class Field {
         public DynamicCellContent(final ConstantDirection direction) {
             this.direction = direction;
         }
+
         public Field.ConstantDirection direction;
     }
 
@@ -826,6 +844,7 @@ public final class Field {
     private static int topLineSize;
     private static int maxTopLine;
     private static int frameCounter;
+
     // Hide constructor
     private Field() {
     }

@@ -7,7 +7,9 @@ import org.jetbrains.annotations.Contract;
 public abstract class ElementCollision {
     public interface ElementCollisionResult {
         GameElement getNextElement();
+
         Field.ConstantPosition getRelativePosition();
+
         Field.ConstantDirection getNextDirection();
     }
 
@@ -22,6 +24,7 @@ public abstract class ElementCollision {
         }
 
         public abstract Field.ConstantPosition getRelativePosition();
+
         public abstract Field.ConstantDirection getNextDirection();
 
         private GameElement nextElement;
@@ -71,9 +74,9 @@ public abstract class ElementCollision {
 
     public final class Move extends ChangedDirection {
         public Move(
-                final GameElement nextElement,
-                final Field.ConstantDirection nextDirection,
-                final Field.ConstantPosition relativePosition
+            final GameElement nextElement,
+            final Field.ConstantDirection nextDirection,
+            final Field.ConstantPosition relativePosition
         ) {
             super(nextElement, nextDirection);
             this.relativePosition = relativePosition;
@@ -86,9 +89,14 @@ public abstract class ElementCollision {
         private Field.ConstantPosition relativePosition;
     }
 
+    protected abstract Field.PlacingAfterCollision determinePlacing(
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
+    );
+
     protected final ElementCollisionResult determineElement1Result(
-            final ElementCollisionData element1,
-            final ElementCollisionData element2
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
     ) {
         assert (element1.getDynamic() || element2.getDynamic());
         try {
@@ -100,8 +108,8 @@ public abstract class ElementCollision {
     }
 
     protected final ElementCollisionResult determineElement2Result(
-            final ElementCollisionData element1,
-            final ElementCollisionData element2
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
     ) {
         assert (element1.getDynamic() || element2.getDynamic());
         try {
@@ -113,12 +121,12 @@ public abstract class ElementCollision {
     }
 
     protected abstract ElementCollisionResult doDetermineElement1Result(
-            final ElementCollisionData element1,
-            final ElementCollisionData element2
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
     );
 
     protected abstract ElementCollisionResult doDetermineElement2Result(
-            final ElementCollisionData element1,
-            final ElementCollisionData element2
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
     );
 }
