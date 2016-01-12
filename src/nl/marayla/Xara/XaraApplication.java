@@ -15,9 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Design:
  * </p>
  * <p>TODO
- *  <li>Implement dynamic-dynamic collision behavior</li>
- *  <li>Fix collision issues with push</li>
- *  <li>Fix collision issues when static is moved into other element</li>
+ *  <li>Fix collision issues with push (currently two failing tests</li>
  *  <li>Make resulting fusion-direction part of fusion</li>
  *  <li>Introduce Field.RelativePosition as derived from ConstantDirection</li>
  *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>
