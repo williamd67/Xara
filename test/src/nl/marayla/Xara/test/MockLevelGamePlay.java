@@ -1,6 +1,5 @@
 package nl.marayla.Xara.test;
 
-import nl.marayla.Xara.ElementCollisions.CollisionResult;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.Renderer.RenderData;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
@@ -30,7 +29,7 @@ class MockLevelGamePlay implements LevelGamePlay {
 
     @Override
     public ElementEffect determineElementEffect(
-        final CollisionResult collisionResult,
+        final Field.PlacingAfterCollision placing,
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {

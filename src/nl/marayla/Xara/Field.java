@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import nl.marayla.Xara.ElementCollisions.CollisionResult;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
@@ -31,16 +30,25 @@ import org.jetbrains.annotations.Contract;
 //  Contains 2D-array of cells
 public final class Field {
 
+    /*
+     * PlacingAfterCollision
+     */
     public interface PlacingAfterCollision {
         void execute();
     }
 
+    /*
+     * PlacingNone
+     */
     public static class PlacingNone implements PlacingAfterCollision {
         @Override
         public final void execute() {
         }
     }
 
+    /*
+     * PlacingOne
+     */
     public static class PlacingOne implements PlacingAfterCollision {
         protected final class PlacingData {
             public PlacingData(final int index, final GameElement element, final ConstantDirection direction) {
@@ -83,6 +91,9 @@ public final class Field {
         private PlacingData placingData;
     }
 
+    /*
+     * PlacingBoth
+     */
     public static class PlacingBoth extends PlacingOne {
         public PlacingBoth(
             final int placingIndexOne,
@@ -106,37 +117,6 @@ public final class Field {
         }
 
         private PlacingData placingData;
-    }
-
-    @Contract("_, null -> fail")
-    private static void placeElementAfterCollision(
-        final int cellIndex,
-        final ElementCollision.ElementCollisionResult result
-    ) {
-        //noinspection StatementWithEmptyBody
-        if (result instanceof ElementCollision.Destroy) {
-            // nothing to do
-        }
-        else if (result instanceof ElementCollision.Keep) {
-            if (getElement(cellIndex) == null) {
-                addElement(cellIndex, result.getNextElement(), result.getNextDirection());
-            }
-            else {
-                handlePlacingCollision(cellIndex, result);
-            }
-        }
-        else if (result instanceof ElementCollision.Move) {
-            int nextIndex = calculateIndex(cellIndex, result.getRelativePosition());
-            if (getElement(nextIndex) == null) {
-                addElement(nextIndex, result.getNextElement(), result.getNextDirection());
-            }
-            else {
-                handlePlacingCollision(nextIndex, result);
-            }
-        }
-        else {
-            throw new UnsupportedOperationException();
-        }
     }
 
     /*
@@ -739,39 +719,15 @@ public final class Field {
             staticCollider
         );
 
-        CollisionResult collisionResult = CollisionResult.determineCollisionResult(
-            dynamicElementCollisionData,
-            staticElementCollisionData
-        );
+        PlacingAfterCollision placing = determinePlacing(dynamicElementCollisionData, staticElementCollisionData);
 
-        // Determine if static will be moved by collision
-        final int nextStaticCellIndex = calculateIndex(
-            staticCellIndex,
-            collisionResult.getElement2Result().getRelativePosition()
-        );
 
-        // Check if static moves
-        if (nextStaticCellIndex != staticCellIndex) {
-            // Static will move =>
-            //   check if it moves to a cell that contains a dynamic-element
-            if (collisions.remove((Integer) nextStaticCellIndex)) {
-                // TODO: Issue5: what happens if the dynamic element did not move?
-                doHandleCollision(collisions, nextStaticCellIndex, levelGamePlay);
-            }
-        }
+        final ElementEffect effect = levelGamePlay.determineElementEffect(placing, dynamicElement, staticElement);
 
-        final ElementEffect effect = levelGamePlay.determineElementEffect(
-            collisionResult,
-            dynamicElement,
-            staticElement
-        );
-
-        // Handle collision
+        // Handle placing
         // dynamic is already removed so no need to remove again
         removeElement(staticCellIndex);
-        // TODO: add test for that position dynamic != static
-        placeElementAfterCollision(staticCellIndex, collisionResult.getElement2Result());
-        placeElementAfterCollision(dynamicCellIndex, collisionResult.getElement1Result());
+        placing.execute();
 
         effect.execute();
     }
@@ -785,13 +741,18 @@ public final class Field {
         dynamicCells.put(nextDynamicCellIndex, dynamicCell);
     }
 
-    // Element would be placed on top of another element
-    private static void handlePlacingCollision(
-        final int cellIndex,
-        final ElementCollision.ElementCollisionResult result
+    private static PlacingAfterCollision determinePlacing(
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
     ) {
-        // Placing should always be successfull as all dynamic elements will be handled one after each other
-        assert false;
+        assert (element1.getDynamic() || element2.getDynamic());
+
+        try {
+            return element1.getCollision().determinePlacing(element1, element2);
+        }
+        catch (UnsupportedOperationException e) {
+            return element2.getCollision().determinePlacing(element2, element1);
+        }
     }
 
     private static void resize(final ConstantSize externalSize) {

@@ -48,7 +48,7 @@ public class SimpleLevel1 extends Level {
 
     @Override
     public final ElementEffect determineElementEffect(
-        final CollisionResult collisionResult,
+        final Field.PlacingAfterCollision placing,
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {
