@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
@@ -430,6 +429,11 @@ public final class Field {
         return cells[index];
     }
 
+    private static ConstantDirection getDirection(final int index) {
+        final DynamicCellContent content = dynamicCells.get(index);
+        return content != null ? content.direction : Direction.STATIC;
+    }
+
     private static void addElement(
         final int index,
         final GameElement element,
@@ -658,102 +662,107 @@ public final class Field {
         final int dynamicCellIndex,
         final LevelGamePlay levelGamePlay
     ) {
-        final DynamicCellContent dynamicCell = dynamicCells.remove(dynamicCellIndex);
-        assert (dynamicCell != null);
+        final ConstantDirection dynamicDirection = getDirection(dynamicCellIndex);
+        assert (dynamicDirection != Direction.STATIC);
         final GameElement dynamicElement = cells[dynamicCellIndex];
         assert (dynamicElement != null);
-        final ConstantDirection dynamicDirection = dynamicCell.direction;
+        dynamicCells.remove(dynamicCellIndex);
         cells[dynamicCellIndex] = null;
 
-        final int staticCellIndex = calculateIndex(dynamicCellIndex, dynamicDirection);
-        GameElement staticElement = cells[staticCellIndex];
-        if (staticElement == null) { // No collision
-            doHandleNoCollision(dynamicCell, dynamicElement, staticCellIndex);
-            return;
-        }
-
-        // Check if it collides with another dynamic element (remove it from collisions-list in case it does)
-        ConstantDirection staticDirection = Direction.STATIC;
-        boolean staticCollider = false;
-        if (collisions.remove((Integer) staticCellIndex)) {
-            // Check if staticElement collides with dynamicElement (directions are opposite)
-            final DynamicCellContent staticCell = dynamicCells.get(staticCellIndex);
-            staticDirection = staticCell.direction;
-            if (staticDirection.reverse() == dynamicDirection) {
-                staticCollider = true;
-            }
-            else {
-                doHandleCollision(collisions, staticCellIndex, levelGamePlay);
-
-                // element can be moved by handling its collision, so determine element again
-                staticElement = cells[staticCellIndex];
-                if (staticElement == null) { // Collision element moved so no collision
-                    doHandleNoCollision(dynamicCell, dynamicElement, staticCellIndex);
-                    return;
-                }
-            }
-        }
-
         // Store information for dynamic-element
-        ElementCollisionData dynamicElementCollisionData = ElementCollisionData.createInstance(
+        final ElementCollisionData elementCollisionData = ElementCollisionData.createInstance(
             dynamicCellIndex,
             dynamicElement,
             dynamicDirection,
-            levelGamePlay.determineElementCollision(dynamicElement, staticElement),
             true
         );
-
-        // Store information for collision-element
-        ElementCollisionData staticElementCollisionData = ElementCollisionData.createInstance(
-            staticCellIndex,
-            staticElement,
-            staticDirection,
-            levelGamePlay.determineElementCollision(staticElement, dynamicElement),
-            staticCollider
-        );
-
-        // Check if staticElement will be moved outside collision-area by collision
-        if (!staticCollider) {
-            final ConstantDirection staticElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
-                dynamicElementCollisionData,
-                staticElementCollisionData
-            );
-            if (staticElementCollisionDirection != Direction.STATIC) {
-                cells[staticCellIndex] = null;
-                addElement(staticCellIndex, staticElement, staticElementCollisionDirection);
-                doHandleCollision(collisions, staticCellIndex, levelGamePlay);
-
-                // element can be moved by handling its collision, so determine element again
-                staticElement = cells[staticCellIndex];
-                if (staticElement == null) { // Collision element moved so no collision
-                    doHandleNoCollision(dynamicCell, dynamicElement, staticCellIndex);
-                    return;
-                }
-
-                // TODO: determine collision-data again
-            }
+        try {
+            executeCollision(collisions, levelGamePlay, elementCollisionData, true);
         }
-
-        PlacingAfterCollision placing = determinePlacing(dynamicElementCollisionData, staticElementCollisionData);
-
-
-        final ElementEffect effect = levelGamePlay.determineElementEffect(placing, dynamicElement, staticElement);
-
-        // Handle placing
-        // dynamic is already removed so no need to remove again
-        removeElement(staticCellIndex);
-        placing.execute();
-
-        effect.execute();
+        finally {
+            ElementCollisionData.releaseInstance(elementCollisionData);
+        }
     }
 
-    private static void doHandleNoCollision(
-        final DynamicCellContent dynamicCell,
-        final GameElement dynamicElement,
-        final int nextDynamicCellIndex
+    private static void executeCollision(
+        final LinkedList<Integer> collisions,
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData,
+        final boolean recursion
     ) {
-        cells[nextDynamicCellIndex] = dynamicElement;
-        dynamicCells.put(nextDynamicCellIndex, dynamicCell);
+        final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(mainElementCollisionData);
+        try {
+            if (otherElementCollisionData.getElement() == null) { // No collision
+                new PlacingOne(
+                    mainElementCollisionData.calculateNextIndex(),
+                    mainElementCollisionData.getElement(),
+                    mainElementCollisionData.getDirection()
+                ).execute();
+                return;
+            }
+
+            // Check if it collides with another dynamic element (remove it from collisions-list in case it does)
+            if (collisions.remove((Integer) otherElementCollisionData.getIndex())) {
+                // Check if otherElement does not collide with mainElement (directions are not opposite)
+                if (!otherElementCollisionData.getDynamic()) {
+                    doHandleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+                    executeCollision(collisions, levelGamePlay, mainElementCollisionData, true);
+                    return;
+                }
+            }
+
+            // Determine collision-elements
+            mainElementCollisionData.determineCollision(levelGamePlay, otherElementCollisionData.getElement());
+            otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
+
+            // Check if staticElement will be moved outside collision-area by collision
+            if (!otherElementCollisionData.getDynamic() && recursion) {
+                final ConstantDirection otherElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
+                    mainElementCollisionData,
+                    otherElementCollisionData
+                );
+                if (otherElementCollisionDirection != Direction.STATIC) {
+                    removeElement(otherElementCollisionData.getIndex());
+                    addElement(
+                        otherElementCollisionData.getIndex(),
+                        otherElementCollisionData.getElement(),
+                        otherElementCollisionDirection
+                    );
+                    doHandleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+                    executeCollision(collisions, levelGamePlay, mainElementCollisionData, false);
+                    return;
+                }
+            }
+
+            final PlacingAfterCollision placing = determinePlacing(mainElementCollisionData, otherElementCollisionData);
+
+            final ElementEffect effect = levelGamePlay.determineElementEffect(
+                placing,
+                mainElementCollisionData.getElement(),
+                otherElementCollisionData.getElement()
+            );
+
+            // Handle placing
+            // dynamic is already removed so no need to remove again
+            removeElement(otherElementCollisionData.getIndex());
+            placing.execute();
+
+            effect.execute();
+        }
+        finally {
+            ElementCollisionData.releaseInstance(otherElementCollisionData);
+        }
+    }
+
+    private static ElementCollisionData createOtherElementCollisionData(final ElementCollisionData elementCollisionData) {
+        final int nextCellIndex = elementCollisionData.calculateNextIndex();
+        final ConstantDirection staticDirection = getDirection(nextCellIndex);
+        return ElementCollisionData.createInstance(
+            nextCellIndex,
+            cells[nextCellIndex],
+            staticDirection,
+            (staticDirection.reverse() == elementCollisionData.getDirection())
+        );
     }
 
     private static ConstantDirection determineDirectionOfStaticElementDueToCollision(

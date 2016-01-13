@@ -1,5 +1,6 @@
 package nl.marayla.Xara.ElementCollisions;
 
+import nl.marayla.Xara.Levels.LevelGamePlay;
 import nl.marayla.Xara.Platform.XaraLog;
 
 import java.util.ArrayList;
@@ -26,14 +27,13 @@ public class ElementCollisionData {
         }
 
     public static ElementCollisionData createInstance(
-            final int index,
-            final GameElement element,
-            final Field.ConstantDirection direction,
-            final ElementCollision collision,
-            final boolean dynamic
+        final int index,
+        final GameElement element,
+        final Field.ConstantDirection direction,
+        final boolean dynamic
     )
     {
-        return getInstance().set(index, element, direction, collision, dynamic);
+        return getInstance().set(index, element, direction, null, dynamic);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -69,12 +69,12 @@ public class ElementCollisionData {
         return dynamic;
     }
 
-    public final void setIndex(final int index) {
-        this.index = index;
+    public final void determineCollision(final LevelGamePlay levelGamePlay, GameElement staticElement) {
+        collision = levelGamePlay.determineElementCollision(element, staticElement);
     }
 
-    public final void setDirection(final Field.ConstantDirection direction) {
-        this.direction = direction;
+    public final int calculateNextIndex() {
+        return Field.calculateIndex(index, direction);
     }
 
     private static ElementCollisionData getInstance() {
