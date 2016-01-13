@@ -3,7 +3,7 @@ package nl.marayla.Xara.ElementCollisions;
 import nl.marayla.Xara.Field;
 
 // TODO Ensure that push does not push elements on top of each other
-public final class Push extends ElementCollision {
+public final class Push implements ElementCollision {
     public static final ElementCollision INSTANCE = new Push();
 
     /*
@@ -68,6 +68,34 @@ public final class Push extends ElementCollision {
         else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public final Field.ConstantDirection moveOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        assert thisData.getDynamic();
+        assert !otherData.getDynamic();
+
+        final ElementCollision other = otherData.getCollision();
+        if ((other == Bounce.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
+            return thisData.getDirection();
+        }
+        else if ((other == Eat.INSTANCE) || (other == Eaten.INSTANCE)) {
+            return Field.Direction.STATIC;
+        }
+        else {
+            return other.isMovedByOtherElementDueToCollision(otherData, thisData);
+        }
+    }
+
+    @Override
+    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        throw new UnsupportedOperationException();
     }
 
     private Push() {

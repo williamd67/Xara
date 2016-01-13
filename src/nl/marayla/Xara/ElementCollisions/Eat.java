@@ -2,7 +2,7 @@ package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
 
-public final class Eat extends ElementCollision {
+public final class Eat implements ElementCollision {
     public static final ElementCollision INSTANCE = new Eat();
 
     /*
@@ -44,6 +44,22 @@ public final class Eat extends ElementCollision {
         else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public final Field.ConstantDirection moveOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        return Field.Direction.STATIC;
+    }
+
+    @Override
+    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        throw new UnsupportedOperationException();
     }
 
     private Eat() {

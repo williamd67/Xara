@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Design:
  * </p>
  * <p>TODO
- *  <li>Fix collision issues with push (currently two failing tests</li>
+ *  <li>Introduce StandardElementCollision as base-class of all standard collisions</li>
  *  <li>Make resulting fusion-direction part of fusion</li>
  *  <li>Introduce Field.RelativePosition as derived from ConstantDirection</li>
  *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>

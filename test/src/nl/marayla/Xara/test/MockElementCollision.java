@@ -1,6 +1,8 @@
 package nl.marayla.Xara.test;
 
+import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementCollisions.Fuse;
+import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 
@@ -15,5 +17,13 @@ class MockFuse extends Fuse {
             return element2;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        return Field.Direction.STATIC;
     }
 }

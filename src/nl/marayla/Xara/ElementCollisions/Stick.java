@@ -2,7 +2,7 @@ package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
 
-public final class Stick extends ElementCollision {
+public final class Stick implements ElementCollision {
     public static final ElementCollision INSTANCE = new Stick();
 
     /*
@@ -68,6 +68,22 @@ public final class Stick extends ElementCollision {
         else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public final Field.ConstantDirection moveOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        return Field.Direction.STATIC;
+    }
+
+    @Override
+    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        throw new UnsupportedOperationException();
     }
 
     private Stick() {

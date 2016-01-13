@@ -3,7 +3,7 @@ package nl.marayla.Xara.ElementCollisions;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 
-public abstract class Fuse extends ElementCollision {
+public abstract class Fuse implements ElementCollision {
     protected abstract GameElement createFusionElement(final GameElement element1, final GameElement element2);
 
     /*
@@ -63,5 +63,13 @@ public abstract class Fuse extends ElementCollision {
             );
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final Field.ConstantDirection moveOtherElementDueToCollision(
+        final ElementCollisionData thisData,
+        final ElementCollisionData otherData
+    ) {
+        return Field.Direction.STATIC;
     }
 }

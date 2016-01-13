@@ -644,9 +644,9 @@ public final class Field {
      * DONE Issue1 : Watch out for GameElement that does not move (Direction.STATIC)
      * -> ignore collision handling
      * DONE Issue2 : DynamicElements can collide in circle -> move all and no collision handling
-     * TODO Issue3 : DynamicElement can point at each other and in that case pass each other
+     * DONE Issue3 : DynamicElement can point at each other and in that case pass each other
      * without collision -> not handled right now
-     * TODO Issue4 : DynamicElement can end-up in same cell (started from different places)
+     * DONE Issue4 : DynamicElement can end-up in same cell (started from different places)
      * -> most difficult to solve -> not handled right now
      *
      * @param collisions       contains list of all collisions that still have to be handled
@@ -667,7 +667,7 @@ public final class Field {
 
         final int staticCellIndex = calculateIndex(dynamicCellIndex, dynamicDirection);
         GameElement staticElement = cells[staticCellIndex];
-        if (staticElement == null) { // No collision or direction == STATIC
+        if (staticElement == null) { // No collision
             doHandleNoCollision(dynamicCell, dynamicElement, staticCellIndex);
             return;
         }
@@ -679,7 +679,10 @@ public final class Field {
             // Check if staticElement collides with dynamicElement (directions are opposite)
             final DynamicCellContent staticCell = dynamicCells.get(staticCellIndex);
             staticDirection = staticCell.direction;
-            if (staticDirection.reverse() != dynamicDirection) {
+            if (staticDirection.reverse() == dynamicDirection) {
+                staticCollider = true;
+            }
+            else {
                 doHandleCollision(collisions, staticCellIndex, levelGamePlay);
 
                 // element can be moved by handling its collision, so determine element again
@@ -689,24 +692,14 @@ public final class Field {
                     return;
                 }
             }
-            else {
-                staticCollider = true;
-            }
         }
-
-        // Determine collision type
-        final ElementCollision dynamicCollision = levelGamePlay.determineElementCollision(
-            dynamicElement,
-            staticElement
-        );
-        final ElementCollision staticCollision = levelGamePlay.determineElementCollision(staticElement, dynamicElement);
 
         // Store information for dynamic-element
         ElementCollisionData dynamicElementCollisionData = ElementCollisionData.createInstance(
             dynamicCellIndex,
             dynamicElement,
             dynamicDirection,
-            dynamicCollision,
+            levelGamePlay.determineElementCollision(dynamicElement, staticElement),
             true
         );
 
@@ -715,9 +708,31 @@ public final class Field {
             staticCellIndex,
             staticElement,
             staticDirection,
-            staticCollision,
+            levelGamePlay.determineElementCollision(staticElement, dynamicElement),
             staticCollider
         );
+
+        // Check if staticElement will be moved outside collision-area by collision
+        if (!staticCollider) {
+            final ConstantDirection staticElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
+                dynamicElementCollisionData,
+                staticElementCollisionData
+            );
+            if (staticElementCollisionDirection != Direction.STATIC) {
+                cells[staticCellIndex] = null;
+                addElement(staticCellIndex, staticElement, staticElementCollisionDirection);
+                doHandleCollision(collisions, staticCellIndex, levelGamePlay);
+
+                // element can be moved by handling its collision, so determine element again
+                staticElement = cells[staticCellIndex];
+                if (staticElement == null) { // Collision element moved so no collision
+                    doHandleNoCollision(dynamicCell, dynamicElement, staticCellIndex);
+                    return;
+                }
+
+                // TODO: determine collision-data again
+            }
+        }
 
         PlacingAfterCollision placing = determinePlacing(dynamicElementCollisionData, staticElementCollisionData);
 
@@ -739,6 +754,18 @@ public final class Field {
     ) {
         cells[nextDynamicCellIndex] = dynamicElement;
         dynamicCells.put(nextDynamicCellIndex, dynamicCell);
+    }
+
+    private static ConstantDirection determineDirectionOfStaticElementDueToCollision(
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
+    ) {
+        if (element2.getDynamic()) {
+            return element2.getDirection();
+        }
+        else {
+            return element1.getCollision().moveOtherElementDueToCollision(element1, element2);
+        }
     }
 
     private static PlacingAfterCollision determinePlacing(
