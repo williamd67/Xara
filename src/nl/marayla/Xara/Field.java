@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
@@ -637,9 +638,8 @@ public final class Field {
         LinkedList<Integer> collisions = new LinkedList<>(movingCells.keySet());
         while (!collisions.isEmpty()) {
             int cellIndex = collisions.removeFirst();
-            assert (cells[cellIndex] != null);
-            assert (movingCells.get(cellIndex) != null);
-            assert (movingCells.get(cellIndex).direction != Direction.STATIC);
+            assert (getElement(cellIndex) != null);
+            assert (getDirection(cellIndex) != Direction.STATIC);
             doHandleCollision(collisions, cellIndex, levelGamePlay);
         }
     }
@@ -662,20 +662,9 @@ public final class Field {
         final int cellIndex,
         final LevelGamePlay levelGamePlay
     ) {
-        final ConstantDirection direction = getDirection(cellIndex);
-        assert (direction != Direction.STATIC);
-        final GameElement element = cells[cellIndex];
-        assert (element != null);
-        removeElement(cellIndex);
-
-        // Store information for main-element
-        final ElementCollisionData elementCollisionData = ElementCollisionData.createInstance(
-            cellIndex,
-            element,
-            direction,
-            true
-        );
+        final ElementCollisionData elementCollisionData = createMainElementCollisionData(cellIndex);
         try {
+            removeElement(cellIndex);
             executeCollision(collisions, levelGamePlay, elementCollisionData, true);
         }
         finally {
@@ -752,6 +741,13 @@ public final class Field {
         finally {
             ElementCollisionData.releaseInstance(otherElementCollisionData);
         }
+    }
+
+    private static ElementCollisionData createMainElementCollisionData(final int cellIndex) {
+        assert (getDirection(cellIndex) != Direction.STATIC);
+        assert (cells[cellIndex] != null);
+
+        return ElementCollisionData.createInstance(cellIndex, cells[cellIndex], getDirection(cellIndex), true);
     }
 
     private static ElementCollisionData createOtherElementCollisionData(final ElementCollisionData elementCollisionData) {
