@@ -147,7 +147,7 @@ public class FieldTest extends BaseFieldTest {
                 position.set(x, y);
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
-                Field.addDynamicElement(
+                Field.addMovingElement(
                     element,
                     position,
                     determineDirectionMethod.execute(position)
@@ -189,7 +189,7 @@ public class FieldTest extends BaseFieldTest {
                 position.set(x, y);
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
-                Field.addDynamicElement(
+                Field.addMovingElement(
                     element,
                     position,
                     determineDirectionMethod.execute(position)
@@ -221,7 +221,7 @@ public class FieldTest extends BaseFieldTest {
                 position.set(x, y);
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
-                Field.addDynamicElement(
+                Field.addMovingElement(
                     element,
                     position,
                     determineDirectionMethod.execute(position)

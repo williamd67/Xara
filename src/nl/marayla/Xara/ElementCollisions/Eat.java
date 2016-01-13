@@ -25,7 +25,7 @@ public final class Eat implements ElementCollision {
         final ElementCollisionData element1,
         final ElementCollisionData element2
     ) {
-        assert element1.getDynamic();
+        assert element1.isMoving();
 
         final ElementCollision other = element2.getCollision();
         if (other == Eat.INSTANCE) {

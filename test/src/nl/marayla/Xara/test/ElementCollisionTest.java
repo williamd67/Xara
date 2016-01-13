@@ -160,7 +160,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
             numberOfRenderCalls,
             numberOfRenderCallsBeforeCollision
         );
-        Field.addDynamicElement(element, start, direction);
+        Field.addMovingElement(element, start, direction);
     }
 
     private void setupGameElements(final LevelElements collisionType) {
@@ -215,7 +215,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
             element.addExpectedRenderPosition(position);
             position.set(position.getX() + direction.getDeltaX(), position.getY() + direction.getDeltaY());
         }
-        Field.addDynamicElement(element, INITIAL_POINT, direction);
+        Field.addMovingElement(element, INITIAL_POINT, direction);
 
         render(NUMBER_OF_RENDER_CALLS);
         verify();
@@ -300,7 +300,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         ) {
             element.addExpectedRenderPosition(dynamicPosition);
         }
-        Field.addDynamicElement(element, start, direction);
+        Field.addMovingElement(element, start, direction);
 
         render(NUMBER_OF_RENDER_CALLS);
         verify();
@@ -338,7 +338,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
             element.addExpectedRenderPosition(position);
             position.set(position.getX() + direction.getDeltaX(), position.getY() + direction.getDeltaY());
         }
-        Field.addDynamicElement(element, start, direction);
+        Field.addMovingElement(element, start, direction);
         return element;
     }
 

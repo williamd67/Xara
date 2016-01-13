@@ -130,7 +130,7 @@ public class SimpleLevel1 extends Level {
         }
         SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, direction);
         figure.setFigureGameElement(figureGameElement);
-        Field.addDynamicElement(LevelElements.FIGURE, getFigurePosition(), figureGameElement.getDirection());
+        Field.addMovingElement(LevelElements.FIGURE, getFigurePosition(), figureGameElement.getDirection());
 
         bonusEffect = new CompositeElementEffect();
         bonusEffect.add(new BonusEffect(1));

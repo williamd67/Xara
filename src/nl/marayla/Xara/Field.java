@@ -20,11 +20,11 @@ import org.jetbrains.annotations.Contract;
 // Attributes of Field:
 //  Contains physics (collision detection)
 //      static objects cannot collide
-//      dynamic objects do collide
+//      moving objects do collide
 //      1. against static object ->
 //          effect determined by static object,
-//          executed on dynamic object by LevelGamePlay
-//      2. against dynamic object ->
+//          executed on moving object by LevelGamePlay
+//      2. against moving object ->
 //          ???
 //  Contains 2D-array of cells
 public final class Field {
@@ -430,7 +430,7 @@ public final class Field {
     }
 
     private static ConstantDirection getDirection(final int index) {
-        final DynamicCellContent content = dynamicCells.get(index);
+        final MovingCellContent content = movingCells.get(index);
         return content != null ? content.direction : Direction.STATIC;
     }
 
@@ -453,7 +453,7 @@ public final class Field {
     private static void removeElement(final int index) {
         if (cells[index] != null) {
             cells[index] = null;
-            dynamicCells.remove(index);
+            movingCells.remove(index);
         }
     }
 
@@ -464,9 +464,9 @@ public final class Field {
         GameElement element = cells[index];
         cells[index] = null;
         cells[nextIndex] = element;
-        if (dynamicCells.containsKey(index)) {
-            DynamicCellContent dynamicCell = dynamicCells.remove(index);
-            dynamicCells.put(nextIndex, dynamicCell);
+        if (movingCells.containsKey(index)) {
+            MovingCellContent movingCellContent = movingCells.remove(index);
+            movingCells.put(nextIndex, movingCellContent);
         }
     }
 
@@ -542,7 +542,7 @@ public final class Field {
         doAddElement(element, externalPosition);
     }
 
-    public static void addDynamicElement(
+    public static void addMovingElement(
         final GameElement element,
         final ConstantPosition externalPosition,
         final ConstantDirection direction
@@ -603,9 +603,9 @@ public final class Field {
     }
 
     private static void addDirection(final int index, final Field.ConstantDirection direction) {
-        assert (!dynamicCells.containsKey(index));
+        assert (!movingCells.containsKey(index));
         if (direction != Direction.STATIC) {
-            dynamicCells.put(index, new DynamicCellContent(direction));
+            movingCells.put(index, new MovingCellContent(direction));
         }
     }
 
@@ -634,12 +634,12 @@ public final class Field {
 
     // Collisions
     private static void handleCollisions(final LevelGamePlay levelGamePlay) {
-        LinkedList<Integer> collisions = new LinkedList<>(dynamicCells.keySet());
+        LinkedList<Integer> collisions = new LinkedList<>(movingCells.keySet());
         while (!collisions.isEmpty()) {
             int cellIndex = collisions.removeFirst();
             assert (cells[cellIndex] != null);
-            assert (dynamicCells.get(cellIndex) != null);
-            assert (dynamicCells.get(cellIndex).direction != Direction.STATIC);
+            assert (movingCells.get(cellIndex) != null);
+            assert (movingCells.get(cellIndex).direction != Direction.STATIC);
             doHandleCollision(collisions, cellIndex, levelGamePlay);
         }
     }
@@ -647,33 +647,32 @@ public final class Field {
     /**
      * DONE Issue1 : Watch out for GameElement that does not move (Direction.STATIC)
      * -> ignore collision handling
-     * DONE Issue2 : DynamicElements can collide in circle -> move all and no collision handling
-     * DONE Issue3 : DynamicElement can point at each other and in that case pass each other
+     * DONE Issue2 : moving elements can collide in circle -> move all and no collision handling
+     * DONE Issue3 : moving elements can point at each other and in that case pass each other
      * without collision -> not handled right now
-     * DONE Issue4 : DynamicElement can end-up in same cell (started from different places)
+     * DONE Issue4 : moving elements can end-up in same cell (started from different places)
      * -> most difficult to solve -> not handled right now
      *
-     * @param collisions       contains list of all collisions that still have to be handled
-     * @param dynamicCellIndex is index of cell that is moving and which possible collision is handled
-     * @param levelGamePlay    gameplay of this level
+     * @param collisions    contains list of all collisions that still have to be handled
+     * @param cellIndex     is index of cell that is moving and which possible collision is handled
+     * @param levelGamePlay gameplay of this level
      */
     private static void doHandleCollision(
         final LinkedList<Integer> collisions,
-        final int dynamicCellIndex,
+        final int cellIndex,
         final LevelGamePlay levelGamePlay
     ) {
-        final ConstantDirection dynamicDirection = getDirection(dynamicCellIndex);
-        assert (dynamicDirection != Direction.STATIC);
-        final GameElement dynamicElement = cells[dynamicCellIndex];
-        assert (dynamicElement != null);
-        dynamicCells.remove(dynamicCellIndex);
-        cells[dynamicCellIndex] = null;
+        final ConstantDirection direction = getDirection(cellIndex);
+        assert (direction != Direction.STATIC);
+        final GameElement element = cells[cellIndex];
+        assert (element != null);
+        removeElement(cellIndex);
 
-        // Store information for dynamic-element
+        // Store information for main-element
         final ElementCollisionData elementCollisionData = ElementCollisionData.createInstance(
-            dynamicCellIndex,
-            dynamicElement,
-            dynamicDirection,
+            cellIndex,
+            element,
+            direction,
             true
         );
         try {
@@ -690,6 +689,7 @@ public final class Field {
         final ElementCollisionData mainElementCollisionData,
         final boolean recursion
     ) {
+        // Store information for other-element
         final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(mainElementCollisionData);
         try {
             if (otherElementCollisionData.getElement() == null) { // No collision
@@ -701,10 +701,10 @@ public final class Field {
                 return;
             }
 
-            // Check if it collides with another dynamic element (remove it from collisions-list in case it does)
+            // Check if it collides with another moving element (remove it from collisions-list in case it does)
             if (collisions.remove((Integer) otherElementCollisionData.getIndex())) {
                 // Check if otherElement does not collide with mainElement (directions are not opposite)
-                if (!otherElementCollisionData.getDynamic()) {
+                if (!otherElementCollisionData.isMoving()) {
                     doHandleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
                     executeCollision(collisions, levelGamePlay, mainElementCollisionData, true);
                     return;
@@ -716,7 +716,7 @@ public final class Field {
             otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
 
             // Check if staticElement will be moved outside collision-area by collision
-            if (!otherElementCollisionData.getDynamic() && recursion) {
+            if (!otherElementCollisionData.isMoving() && recursion) {
                 final ConstantDirection otherElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
                     mainElementCollisionData,
                     otherElementCollisionData
@@ -743,7 +743,7 @@ public final class Field {
             );
 
             // Handle placing
-            // dynamic is already removed so no need to remove again
+            // main is already removed so no need to remove again
             removeElement(otherElementCollisionData.getIndex());
             placing.execute();
 
@@ -769,7 +769,7 @@ public final class Field {
         final ElementCollisionData element1,
         final ElementCollisionData element2
     ) {
-        if (element2.getDynamic()) {
+        if (element2.isMoving()) {
             return element2.getDirection();
         }
         else {
@@ -781,7 +781,7 @@ public final class Field {
         final ElementCollisionData element1,
         final ElementCollisionData element2
     ) {
-        assert (element1.getDynamic() || element2.getDynamic());
+        assert (element1.isMoving() || element2.isMoving());
 
         try {
             return element1.getCollision().determinePlacing(element1, element2);
@@ -798,7 +798,7 @@ public final class Field {
 
     private static void createCells() {
         cells = new GameElement[arraySize.getWidth() * arraySize.getHeight()];
-        dynamicCells.clear();
+        movingCells.clear();
     }
 
     private static void setTopLinePosition(final TopLinePosition inputTopLinePosition) {
@@ -824,8 +824,8 @@ public final class Field {
         }
     }
 
-    private static class DynamicCellContent {
-        public DynamicCellContent(final ConstantDirection direction) {
+    private static class MovingCellContent {
+        public MovingCellContent(final ConstantDirection direction) {
             this.direction = direction;
         }
 
@@ -833,7 +833,7 @@ public final class Field {
     }
 
     private static GameElement[] cells;
-    private static Map<Integer, DynamicCellContent> dynamicCells = new TreeMap<>();
+    private static Map<Integer, MovingCellContent> movingCells = new TreeMap<>();
     private static Size arraySize = new Size(0, 0);
     private static RenderCells renderCells;
     private static TopLinePosition topLinePosition;

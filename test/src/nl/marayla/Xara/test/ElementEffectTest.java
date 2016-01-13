@@ -15,7 +15,7 @@ public class ElementEffectTest extends BaseCollisionFieldTest {
             element.addExpectedRenderPosition(position);
             position.set(position.getX(), position.getY() + 1);
         }
-        Field.addDynamicElement(element, initial, Field.Direction.DOWN);
+        Field.addMovingElement(element, initial, Field.Direction.DOWN);
 
         render(NUMBER_OF_RENDER_CALLS);
         verify();

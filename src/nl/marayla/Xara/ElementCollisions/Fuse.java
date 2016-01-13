@@ -37,7 +37,7 @@ public abstract class Fuse implements ElementCollision {
         final ElementCollision other = element2.getCollision();
         if ((other == Bounce.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
             return new Field.PlacingOne(
-                element1.getDynamic()
+                element1.isMoving()
                     ? Field.calculateIndex(element1.getIndex(), element1.getDirection())
                     : element1.getIndex(),
                 createFusionElement(element1.getElement(), element2.getElement()),
@@ -46,7 +46,7 @@ public abstract class Fuse implements ElementCollision {
         }
         else if (other == Eat.INSTANCE) {
             return new Field.PlacingOne(
-                element2.getDynamic()
+                element2.isMoving()
                     ? Field.calculateIndex(element2.getIndex(), element2.getDirection())
                     : element2.getIndex(),
                 element2.getElement(),
@@ -55,7 +55,7 @@ public abstract class Fuse implements ElementCollision {
         }
         else if (other == Eaten.INSTANCE) {
             return new Field.PlacingOne(
-                element1.getDynamic()
+                element1.isMoving()
                     ? Field.calculateIndex(element1.getIndex(), element1.getDirection())
                     : element1.getIndex(),
                 element1.getElement(),

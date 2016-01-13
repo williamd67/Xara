@@ -25,7 +25,7 @@ public final class Eaten implements ElementCollision {
         final ElementCollisionData element1,
         final ElementCollisionData element2
     ) {
-        assert element1.getDynamic();
+        assert element1.isMoving();
 
         final ElementCollision other = element2.getCollision();
         if (other == Eaten.INSTANCE) {
@@ -35,13 +35,13 @@ public final class Eaten implements ElementCollision {
             return new Field.PlacingOne(
                 element2.getIndex(),
                 element2.getElement(),
-                element2.getDynamic() ? element2.getDirection().reverse() : element2.getDirection()
+                element2.isMoving() ? element2.getDirection().reverse() : element2.getDirection()
             );
         }
         else if ((other == Eat.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
             return new Field.PlacingOne(
                 (
-                    element2.getDynamic() ?
+                    element2.isMoving() ?
                         Field.calculateIndex(element2.getIndex(), element2.getDirection()) :
                         element2.getIndex()
                 ),

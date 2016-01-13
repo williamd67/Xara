@@ -30,10 +30,10 @@ public class ElementCollisionData {
         final int index,
         final GameElement element,
         final Field.ConstantDirection direction,
-        final boolean dynamic
+        final boolean isMoving
     )
     {
-        return getInstance().set(index, element, direction, null, dynamic);
+        return getInstance().set(index, element, direction, null, isMoving);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -65,8 +65,8 @@ public class ElementCollisionData {
         return collision;
     }
 
-    public final boolean getDynamic() {
-        return dynamic;
+    public final boolean isMoving() {
+        return this.isMoving;
     }
 
     public final void determineCollision(final LevelGamePlay levelGamePlay, GameElement staticElement) {
@@ -91,7 +91,7 @@ public class ElementCollisionData {
                 other.getElement(),
                 other.getDirection(),
                 other.getCollision(),
-                other.getDynamic()
+            other.isMoving()
         );
     }
 
@@ -104,13 +104,13 @@ public class ElementCollisionData {
             final GameElement element,
             final Field.ConstantDirection direction,
             final ElementCollision collision,
-            final boolean dynamic
+        final boolean isMoving
     ) {
         this.index = index;
         this.element = element;
         this.direction = direction;
         this.collision = collision;
-        this.dynamic = dynamic;
+        this.isMoving = isMoving;
 
         return this;
     }
@@ -119,7 +119,7 @@ public class ElementCollisionData {
     private GameElement element;
     private Field.ConstantDirection direction;
     private ElementCollision collision;
-    private boolean dynamic;
+    private boolean isMoving;
 
     private ElementCollisionData() {
         reset();
