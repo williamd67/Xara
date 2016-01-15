@@ -2,6 +2,7 @@ package nl.marayla.Xara;
 
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
@@ -18,15 +19,11 @@ import nl.marayla.Xara.Renderer.RenderData;
 import org.jetbrains.annotations.Contract;
 
 // Attributes of Field:
-//  Contains physics (collision detection)
-//      static objects cannot collide
-//      moving objects do collide
-//      1. against static object ->
-//          effect determined by static object,
-//          executed on moving object by LevelGamePlay
-//      2. against moving object ->
-//          ???
 //  Contains 2D-array of cells
+//  Contains physics (collision detection)
+//      moving objects can collide
+//      1. new placing determined by collision-resolver and element-collisions
+//      2. effect determined by elements and placing
 public final class Field {
 
     /*
@@ -413,219 +410,6 @@ public final class Field {
     }
 
     /*
-     * CollisionHandler
-     */
-    private static class CollisionHandler {
-        private static void executeMovesBeforeCollision(
-            final LinkedList<Integer> collisions,
-            final LevelGamePlay levelGamePlay,
-            final ElementCollisionData mainElementCollisionData
-        ) {
-            // Store information for other-element
-            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
-                mainElementCollisionData
-            );
-            try {
-                if (causeCollision(otherElementCollisionData)) {
-                    doExecuteMovesBeforeCollision(
-                        collisions,
-                        levelGamePlay,
-                        mainElementCollisionData,
-                        otherElementCollisionData
-                    );
-                }
-                else {
-                    executeNoCollision(mainElementCollisionData);
-                }
-            }
-            finally {
-                ElementCollisionData.releaseInstance(otherElementCollisionData);
-            }
-        }
-
-        private static void doExecuteMovesBeforeCollision(
-            LinkedList<Integer> collisions,
-            LevelGamePlay levelGamePlay,
-            ElementCollisionData mainElementCollisionData,
-            ElementCollisionData otherElementCollisionData
-        ) {
-            if (movesBeforeCollision(collisions, otherElementCollisionData)) {
-                handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
-                executeMovesByCollision(collisions, levelGamePlay, mainElementCollisionData);
-            }
-            else {
-                doExecuteMovesByCollision(
-                    collisions,
-                    levelGamePlay,
-                    mainElementCollisionData,
-                    otherElementCollisionData
-                );
-            }
-        }
-
-        private static void executeMovesByCollision(
-            final LinkedList<Integer> collisions,
-            final LevelGamePlay levelGamePlay,
-            final ElementCollisionData mainElementCollisionData
-        ) {
-            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
-                mainElementCollisionData
-            );
-            try {
-                if (causeCollision(otherElementCollisionData)) {
-                    doExecuteMovesByCollision(
-                        collisions,
-                        levelGamePlay,
-                        mainElementCollisionData,
-                        otherElementCollisionData
-                    );
-                }
-                else {
-                    executeNoCollision(mainElementCollisionData);
-                }
-            }
-            finally {
-                ElementCollisionData.releaseInstance(otherElementCollisionData);
-            }
-        }
-
-        private static void doExecuteMovesByCollision(
-            final LinkedList<Integer> collisions,
-            final LevelGamePlay levelGamePlay,
-            final ElementCollisionData mainElementCollisionData,
-            final ElementCollisionData otherElementCollisionData
-        ) {
-            determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
-
-            // Check if staticElement will be moved outside collision-area by collision
-            final ConstantDirection otherElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
-                mainElementCollisionData,
-                otherElementCollisionData
-            );
-            if (otherElementCollisionDirection != Direction.STATIC) {
-                changeToMovingElement(otherElementCollisionData, otherElementCollisionDirection);
-                handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
-                executePlacingAndEffect(levelGamePlay, mainElementCollisionData);
-            }
-            else {
-                doExecutePlacingAndEffect(
-                    levelGamePlay,
-                    mainElementCollisionData,
-                    otherElementCollisionData
-                );
-            }
-        }
-
-        private static void executePlacingAndEffect(
-            final LevelGamePlay levelGamePlay,
-            final ElementCollisionData mainElementCollisionData
-        ) {
-            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
-                mainElementCollisionData
-            );
-            try {
-                if (causeCollision(otherElementCollisionData)) {
-                    determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
-                    doExecutePlacingAndEffect(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
-                }
-                else {
-                    executeNoCollision(mainElementCollisionData);
-                }
-            }
-            finally {
-                ElementCollisionData.releaseInstance(otherElementCollisionData);
-            }
-        }
-
-        private static void doExecutePlacingAndEffect(
-            LevelGamePlay levelGamePlay,
-            ElementCollisionData mainElementCollisionData,
-            ElementCollisionData otherElementCollisionData
-        ) {
-            final PlacingAfterCollision placing = determinePlacing(
-                mainElementCollisionData,
-                otherElementCollisionData
-            );
-
-            final ElementEffect effect = levelGamePlay.determineElementEffect(
-                placing,
-                mainElementCollisionData.getElement(),
-                otherElementCollisionData.getElement()
-            );
-
-            // main is already removed so no need to remove again
-            Field.removeElement(otherElementCollisionData.getIndex());
-
-            placing.execute();
-            effect.execute();
-        }
-
-        private static boolean movesBeforeCollision(
-            final LinkedList<Integer> collisions,
-            final ElementCollisionData elementCollisionData
-        ) {
-            // element is part of collisions and is not colliding with current element
-            return (collisions.remove((Integer) elementCollisionData.getIndex()) &&
-                !elementCollisionData.isColliding());
-        }
-
-        private static ConstantDirection determineDirectionOfStaticElementDueToCollision(
-            final ElementCollisionData mainElement,
-            final ElementCollisionData otherElement
-        ) {
-            if (otherElement.isColliding()) {
-                return Direction.STATIC;
-            }
-            else {
-                return mainElement.getCollision().moveOtherElementDueToCollision(mainElement, otherElement);
-            }
-        }
-
-        private static void changeToMovingElement(
-            final ElementCollisionData elementCollisionData,
-            final ConstantDirection direction
-        ) {
-            removeElement(elementCollisionData.getIndex());
-            addElement(elementCollisionData.getIndex(), elementCollisionData.getElement(), direction);
-        }
-
-        private static boolean causeCollision(final ElementCollisionData elementCollisionData) {
-            return (elementCollisionData.getElement() != null);
-        }
-
-        private static void determineCollisions(
-            final LevelGamePlay levelGamePlay,
-            final ElementCollisionData mainElementCollisionData,
-            final ElementCollisionData otherElementCollisionData
-        ) {
-            mainElementCollisionData.determineCollision(levelGamePlay, otherElementCollisionData.getElement());
-            otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
-        }
-
-        private static void executeNoCollision(final ElementCollisionData elementCollisionData) {
-            new PlacingOne(
-                elementCollisionData.calculateNextIndex(),
-                elementCollisionData.getElement(),
-                elementCollisionData.getDirection()
-            ).execute();
-        }
-
-        private static PlacingAfterCollision determinePlacing(
-            final ElementCollisionData element1,
-            final ElementCollisionData element2
-        ) {
-            assert (element1.isColliding() || element2.isColliding());
-
-            try {
-                return element1.getCollision().determinePlacing(element1, element2);
-            }
-            catch (UnsupportedOperationException e) {
-                return element2.getCollision().determinePlacing(element2, element1);
-            }
-        }
-    }
-
-    /*
      * FieldRenderer interface
      */
     public static void render(final LevelGamePlay levelGamePlay, final RenderData renderData) {
@@ -642,12 +426,13 @@ public final class Field {
         return cells[index];
     }
 
-    private static ConstantDirection getDirection(final int index) {
+    @Contract(pure = true)
+    protected static ConstantDirection getDirection(final int index) {
         final MovingCellContent content = movingCells.get(index);
         return content != null ? content.direction : Direction.STATIC;
     }
 
-    private static void addElement(
+    protected static void addElement(
         final int index,
         final GameElement element,
         final ConstantDirection direction
@@ -663,23 +448,10 @@ public final class Field {
      *
      * @param index is the element-index that determines which element to remove
      */
-    private static void removeElement(final int index) {
+    protected static void removeElement(final int index) {
         if (cells[index] != null) {
             cells[index] = null;
             movingCells.remove(index);
-        }
-    }
-
-    private static void moveElement(final int index, final int nextIndex) {
-        assert (cells[index] != null);
-        assert (cells[nextIndex] == null);
-
-        GameElement element = cells[index];
-        cells[index] = null;
-        cells[nextIndex] = element;
-        if (movingCells.containsKey(index)) {
-            MovingCellContent movingCellContent = movingCells.remove(index);
-            movingCells.put(nextIndex, movingCellContent);
         }
     }
 
@@ -774,7 +546,7 @@ public final class Field {
             XaraLog.log.e("Some error", "Some error-message");
         }
         frameCounter++;
-        handleCollisions(levelGamePlay);
+        CollisionHandler.handleAllCollisions(levelGamePlay, movingCells.keySet());
         // TODO Determine when exactly to update topLine
         if (topLinePosition != Field.TopLinePosition.NONE) {
             if (topLine == 0) {
@@ -845,63 +617,6 @@ public final class Field {
         return index;
     }
 
-    // Collisions
-    private static void handleCollisions(final LevelGamePlay levelGamePlay) {
-        LinkedList<Integer> collisions = new LinkedList<>(movingCells.keySet());
-        while (!collisions.isEmpty()) {
-            int cellIndex = collisions.removeFirst();
-            assert (getElement(cellIndex) != null);
-            assert (getDirection(cellIndex) != Direction.STATIC);
-            handleSingleCollision(collisions, cellIndex, levelGamePlay);
-        }
-    }
-
-    /**
-     * DONE Issue1 : Watch out for GameElement that does not move (Direction.STATIC)
-     * -> ignore collision handling
-     * DONE Issue2 : moving elements can collide in circle -> move all and no collision handling
-     * DONE Issue3 : moving elements can point at each other and in that case pass each other
-     * without collision -> not handled right now
-     * DONE Issue4 : moving elements can end-up in same cell (started from different places)
-     * -> most difficult to solve -> not handled right now
-     *
-     * @param collisions    contains list of all collisions that still have to be handled
-     * @param cellIndex     is index of cell that is moving and which possible collision is handled
-     * @param levelGamePlay gameplay of this level
-     */
-    private static void handleSingleCollision(
-        final LinkedList<Integer> collisions,
-        final int cellIndex,
-        final LevelGamePlay levelGamePlay
-    ) {
-        final ElementCollisionData elementCollisionData = createMainElementCollisionData(cellIndex);
-        try {
-            removeElement(cellIndex);
-            CollisionHandler.executeMovesBeforeCollision(collisions, levelGamePlay, elementCollisionData);
-        }
-        finally {
-            ElementCollisionData.releaseInstance(elementCollisionData);
-        }
-    }
-
-    private static ElementCollisionData createMainElementCollisionData(final int cellIndex) {
-        assert (getDirection(cellIndex) != Direction.STATIC);
-        assert (cells[cellIndex] != null);
-
-        return ElementCollisionData.createInstance(cellIndex, cells[cellIndex], getDirection(cellIndex), true);
-    }
-
-    private static ElementCollisionData createOtherElementCollisionData(final ElementCollisionData elementCollisionData) {
-        final int nextCellIndex = elementCollisionData.calculateNextIndex();
-        final ConstantDirection staticDirection = getDirection(nextCellIndex);
-        return ElementCollisionData.createInstance(
-            nextCellIndex,
-            cells[nextCellIndex],
-            staticDirection,
-            (staticDirection.reverse() == elementCollisionData.getDirection())
-        );
-    }
-
     private static void resize(final ConstantSize externalSize) {
         arraySize.set(externalSize.getWidth() + 2, externalSize.getHeight() + 2);
         createCells();
@@ -955,5 +670,279 @@ public final class Field {
 
     // Hide constructor
     private Field() {
+    }
+}
+
+/*
+ * CollisionHandler
+ */
+class CollisionHandler {
+    public static void handleAllCollisions(final LevelGamePlay levelGamePlay, final Set<Integer> movingCells) {
+        LinkedList<Integer> collisions = new LinkedList<>(movingCells);
+        while (!collisions.isEmpty()) {
+            int cellIndex = collisions.removeFirst();
+            assert (Field.getElement(cellIndex) != null);
+            assert (Field.getDirection(cellIndex) != Field.Direction.STATIC);
+            handleSingleCollision(collisions, cellIndex, levelGamePlay);
+        }
+    }
+
+    /**
+     * DONE Issue1 : Watch out for GameElement that does not move (Direction.STATIC)
+     * -> ignore collision handling
+     * DONE Issue2 : moving elements can collide in circle -> move all and no collision handling
+     * DONE Issue3 : moving elements can point at each other and in that case pass each other
+     * without collision -> not handled right now
+     * DONE Issue4 : moving elements can end-up in same cell (started from different places)
+     * -> most difficult to solve -> not handled right now
+     *
+     * @param collisions    contains list of all collisions that still have to be handled
+     * @param cellIndex     is index of cell that is moving and which possible collision is handled
+     * @param levelGamePlay gameplay of this level
+     */
+    private static void handleSingleCollision(
+        final LinkedList<Integer> collisions,
+        final int cellIndex,
+        final LevelGamePlay levelGamePlay
+    ) {
+        final ElementCollisionData elementCollisionData = createMainElementCollisionData(cellIndex);
+        try {
+            Field.removeElement(cellIndex);
+            executeMovesBeforeCollision(collisions, levelGamePlay, elementCollisionData);
+        }
+        finally {
+            ElementCollisionData.releaseInstance(elementCollisionData);
+        }
+    }
+
+    private static void executeMovesBeforeCollision(
+        final LinkedList<Integer> collisions,
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData
+    ) {
+        // Store information for other-element
+        final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+            mainElementCollisionData
+        );
+        try {
+            if (causeCollision(otherElementCollisionData)) {
+                doExecuteMovesBeforeCollision(
+                    collisions,
+                    levelGamePlay,
+                    mainElementCollisionData,
+                    otherElementCollisionData
+                );
+            }
+            else {
+                executeNoCollision(mainElementCollisionData);
+            }
+        }
+        finally {
+            ElementCollisionData.releaseInstance(otherElementCollisionData);
+        }
+    }
+
+    private static void doExecuteMovesBeforeCollision(
+        LinkedList<Integer> collisions,
+        LevelGamePlay levelGamePlay,
+        ElementCollisionData mainElementCollisionData,
+        ElementCollisionData otherElementCollisionData
+    ) {
+        if (movesBeforeCollision(collisions, otherElementCollisionData)) {
+            handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+            executeMovesByCollision(collisions, levelGamePlay, mainElementCollisionData);
+        }
+        else {
+            doExecuteMovesByCollision(
+                collisions,
+                levelGamePlay,
+                mainElementCollisionData,
+                otherElementCollisionData
+            );
+        }
+    }
+
+    private static void executeMovesByCollision(
+        final LinkedList<Integer> collisions,
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData
+    ) {
+        final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+            mainElementCollisionData
+        );
+        try {
+            if (causeCollision(otherElementCollisionData)) {
+                doExecuteMovesByCollision(
+                    collisions,
+                    levelGamePlay,
+                    mainElementCollisionData,
+                    otherElementCollisionData
+                );
+            }
+            else {
+                executeNoCollision(mainElementCollisionData);
+            }
+        }
+        finally {
+            ElementCollisionData.releaseInstance(otherElementCollisionData);
+        }
+    }
+
+    private static void doExecuteMovesByCollision(
+        final LinkedList<Integer> collisions,
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData,
+        final ElementCollisionData otherElementCollisionData
+    ) {
+        determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+
+        // Check if staticElement will be moved outside collision-area by collision
+        final Field.ConstantDirection otherElementCollisionDirection = determineDirectionOfElementDueToCollision(
+            mainElementCollisionData,
+            otherElementCollisionData
+        );
+        if (otherElementCollisionDirection != Field.Direction.STATIC) {
+            changeToMovingElement(otherElementCollisionData, otherElementCollisionDirection);
+            handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+            executePlacingAndEffect(levelGamePlay, mainElementCollisionData);
+        }
+        else {
+            doExecutePlacingAndEffect(
+                levelGamePlay,
+                mainElementCollisionData,
+                otherElementCollisionData
+            );
+        }
+    }
+
+    private static void executePlacingAndEffect(
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData
+    ) {
+        final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+            mainElementCollisionData
+        );
+        try {
+            if (causeCollision(otherElementCollisionData)) {
+                determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+                doExecutePlacingAndEffect(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+            }
+            else {
+                executeNoCollision(mainElementCollisionData);
+            }
+        }
+        finally {
+            ElementCollisionData.releaseInstance(otherElementCollisionData);
+        }
+    }
+
+    private static void doExecutePlacingAndEffect(
+        LevelGamePlay levelGamePlay,
+        ElementCollisionData mainElementCollisionData,
+        ElementCollisionData otherElementCollisionData
+    ) {
+        final Field.PlacingAfterCollision placing = determinePlacing(
+            mainElementCollisionData,
+            otherElementCollisionData
+        );
+
+        final ElementEffect effect = levelGamePlay.determineElementEffect(
+            placing,
+            mainElementCollisionData.getElement(),
+            otherElementCollisionData.getElement()
+        );
+
+        // main is already removed so no need to remove again
+        Field.removeElement(otherElementCollisionData.getIndex());
+
+        placing.execute();
+        effect.execute();
+    }
+
+    private static void executeNoCollision(final ElementCollisionData elementCollisionData) {
+        new Field.PlacingOne(
+            elementCollisionData.calculateNextIndex(),
+            elementCollisionData.getElement(),
+            elementCollisionData.getDirection()
+        ).execute();
+    }
+
+    private static void determineCollisions(
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData,
+        final ElementCollisionData otherElementCollisionData
+    ) {
+        mainElementCollisionData.determineCollision(levelGamePlay, otherElementCollisionData.getElement());
+        otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
+    }
+
+    private static Field.ConstantDirection determineDirectionOfElementDueToCollision(
+        final ElementCollisionData mainElement,
+        final ElementCollisionData otherElement
+    ) {
+        if (otherElement.isColliding()) {
+            return Field.Direction.STATIC;
+        }
+        else {
+            return mainElement.getCollision().moveOtherElementDueToCollision(mainElement, otherElement);
+        }
+    }
+
+    private static Field.PlacingAfterCollision determinePlacing(
+        final ElementCollisionData element1,
+        final ElementCollisionData element2
+    ) {
+        assert (element1.isColliding() || element2.isColliding());
+
+        try {
+            return element1.getCollision().determinePlacing(element1, element2);
+        }
+        catch (UnsupportedOperationException e) {
+            return element2.getCollision().determinePlacing(element2, element1);
+        }
+    }
+
+    private static void changeToMovingElement(
+        final ElementCollisionData elementCollisionData,
+        final Field.ConstantDirection direction
+    ) {
+        Field.removeElement(elementCollisionData.getIndex());
+        Field.addElement(elementCollisionData.getIndex(), elementCollisionData.getElement(), direction);
+    }
+
+    private static boolean movesBeforeCollision(
+        final LinkedList<Integer> collisions,
+        final ElementCollisionData elementCollisionData
+    ) {
+        // element is part of collisions and is not colliding with current element
+        return (collisions.remove((Integer) elementCollisionData.getIndex()) &&
+            !elementCollisionData.isColliding());
+    }
+
+    private static boolean causeCollision(final ElementCollisionData elementCollisionData) {
+        return (elementCollisionData.getElement() != null);
+    }
+
+    private static ElementCollisionData createMainElementCollisionData(final int cellIndex) {
+        assert (Field.getDirection(cellIndex) != Field.Direction.STATIC);
+        assert (Field.getElement(cellIndex) != null);
+
+        return ElementCollisionData.createInstance(
+            cellIndex,
+            Field.getElement(cellIndex),
+            Field.getDirection(cellIndex),
+            true
+        );
+    }
+
+    private static ElementCollisionData createOtherElementCollisionData(final ElementCollisionData elementCollisionData) {
+        final int nextCellIndex = elementCollisionData.calculateNextIndex();
+        final Field.ConstantDirection staticDirection = Field.getDirection(nextCellIndex);
+        return ElementCollisionData.createInstance(
+            nextCellIndex,
+            Field.getElement(nextCellIndex),
+            staticDirection,
+            (staticDirection.reverse() == elementCollisionData.getDirection())
+        );
     }
 }
