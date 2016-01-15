@@ -14,30 +14,6 @@ import org.jetbrains.annotations.Nullable;
  * Xara class is main-class for Xara-game-environment.
  * <p>Design:
  * </p>
- * <p>TODO
- *  <li>Introduce StandardElementCollision as base-class of all standard collisions</li>
- *  <li>Make resulting fusion-direction part of fusion</li>
- *  <li>Introduce Field.RelativePosition as derived from ConstantDirection</li>
- *  <li>Introduce move Field in multiple directions as once (introduce Direction)</li>
- *  <li>Check all Field.TopLinePosition's with new FigureGameElement</li>
- *  <li>Remove render-method from Field</li>
- *  <li>Reconnect Widener again and solve issues</li>
- *  <li>Solve two (figure)GameElements connected to each other moving together</li>
- *  <li>Introduce ball</li>
- *  <li>Introduce in-between render-frames (with interpolation)</li>
- *  <li>Introduce 50 frames per second rendering;
- *      Already improved to 20 frames per second (basic rendering is bottle-neck in emulator)
- *      Possible solution: create bitmap with all static GameElement's and reuse bitmap</li>
- *  <li>Introduce reading of bitmap to create level</li>
- *  <li>Introduce proper documentation (JavaDoc)</li>
- *  <li>Introduce proper count-down GameState to start level</li>
- *  <li>Make InputHandler level-dependent</li>
- *  <li>Introduce 3D-fields as well</li>
- *  <li>Re-introduce rendering of debug-grid</li>
- *  <li>FRAME_TIME (GameStateMachine) cannot be a static is GameState and level-dependent;
- *      should be set from outside</li>
- *  <li>Renderer contains some TODO's</li>
- *  </p><br>
  * <p>TODO Bug-fixes
  *  </p><br>
  * <p>TODO Clean-up
