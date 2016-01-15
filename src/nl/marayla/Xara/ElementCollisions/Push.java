@@ -26,7 +26,7 @@ public final class Push implements ElementCollision {
         final ElementCollisionData element1,
         final ElementCollisionData element2
     ) {
-        assert element1.isMoving();
+        assert element1.isColliding();
 
         final ElementCollision other = element2.getCollision();
         if ((other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
@@ -46,12 +46,12 @@ public final class Push implements ElementCollision {
                 element1.getDirection(),
                 element2.getIndex(),
                 element2.getElement(),
-                element2.isMoving() ? element2.getDirection().reverse() : element2.getDirection()
+                element2.isColliding() ? element2.getDirection().reverse() : element2.getDirection()
             );
         }
         else if (other == Eat.INSTANCE) {
             return new Field.PlacingOne(
-                element2.isMoving()
+                element2.isColliding()
                     ? Field.calculateIndex(element2.getIndex(), element2.getDirection())
                     : element2.getIndex(),
                 element2.getElement(),
@@ -75,8 +75,8 @@ public final class Push implements ElementCollision {
         final ElementCollisionData thisData,
         final ElementCollisionData otherData
     ) {
-        assert thisData.isMoving();
-        assert !otherData.isMoving();
+        assert thisData.isColliding();
+        assert !otherData.isColliding();
 
         final ElementCollision other = otherData.getCollision();
         if ((other == Bounce.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {

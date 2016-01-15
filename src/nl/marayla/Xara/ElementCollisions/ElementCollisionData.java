@@ -30,10 +30,10 @@ public class ElementCollisionData {
         final int index,
         final GameElement element,
         final Field.ConstantDirection direction,
-        final boolean isMoving
+        final boolean isColliding
     )
     {
-        return getInstance().set(index, element, direction, null, isMoving);
+        return getInstance().set(index, element, direction, null, isColliding);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -65,8 +65,8 @@ public class ElementCollisionData {
         return collision;
     }
 
-    public final boolean isMoving() {
-        return this.isMoving;
+    public final boolean isColliding() {
+        return this.isColliding;
     }
 
     public final void determineCollision(final LevelGamePlay levelGamePlay, GameElement staticElement) {
@@ -91,7 +91,7 @@ public class ElementCollisionData {
                 other.getElement(),
                 other.getDirection(),
                 other.getCollision(),
-            other.isMoving()
+            other.isColliding()
         );
     }
 
@@ -100,17 +100,17 @@ public class ElementCollisionData {
     }
 
     private ElementCollisionData set(
-            final int index,
-            final GameElement element,
-            final Field.ConstantDirection direction,
-            final ElementCollision collision,
-        final boolean isMoving
+        final int index,
+        final GameElement element,
+        final Field.ConstantDirection direction,
+        final ElementCollision collision,
+        final boolean isColliding
     ) {
         this.index = index;
         this.element = element;
         this.direction = direction;
         this.collision = collision;
-        this.isMoving = isMoving;
+        this.isColliding = isColliding;
 
         return this;
     }
@@ -119,7 +119,7 @@ public class ElementCollisionData {
     private GameElement element;
     private Field.ConstantDirection direction;
     private ElementCollision collision;
-    private boolean isMoving;
+    private boolean isColliding;
 
     private ElementCollisionData() {
         reset();

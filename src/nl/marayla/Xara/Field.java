@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
@@ -414,6 +413,219 @@ public final class Field {
     }
 
     /*
+     * CollisionHandler
+     */
+    private static class CollisionHandler {
+        private static void executeMovesBeforeCollision(
+            final LinkedList<Integer> collisions,
+            final LevelGamePlay levelGamePlay,
+            final ElementCollisionData mainElementCollisionData
+        ) {
+            // Store information for other-element
+            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+                mainElementCollisionData
+            );
+            try {
+                if (causeCollision(otherElementCollisionData)) {
+                    doExecuteMovesBeforeCollision(
+                        collisions,
+                        levelGamePlay,
+                        mainElementCollisionData,
+                        otherElementCollisionData
+                    );
+                }
+                else {
+                    executeNoCollision(mainElementCollisionData);
+                }
+            }
+            finally {
+                ElementCollisionData.releaseInstance(otherElementCollisionData);
+            }
+        }
+
+        private static void doExecuteMovesBeforeCollision(
+            LinkedList<Integer> collisions,
+            LevelGamePlay levelGamePlay,
+            ElementCollisionData mainElementCollisionData,
+            ElementCollisionData otherElementCollisionData
+        ) {
+            if (movesBeforeCollision(collisions, otherElementCollisionData)) {
+                handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+                executeMovesByCollision(collisions, levelGamePlay, mainElementCollisionData);
+            }
+            else {
+                doExecuteMovesByCollision(
+                    collisions,
+                    levelGamePlay,
+                    mainElementCollisionData,
+                    otherElementCollisionData
+                );
+            }
+        }
+
+        private static void executeMovesByCollision(
+            final LinkedList<Integer> collisions,
+            final LevelGamePlay levelGamePlay,
+            final ElementCollisionData mainElementCollisionData
+        ) {
+            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+                mainElementCollisionData
+            );
+            try {
+                if (causeCollision(otherElementCollisionData)) {
+                    doExecuteMovesByCollision(
+                        collisions,
+                        levelGamePlay,
+                        mainElementCollisionData,
+                        otherElementCollisionData
+                    );
+                }
+                else {
+                    executeNoCollision(mainElementCollisionData);
+                }
+            }
+            finally {
+                ElementCollisionData.releaseInstance(otherElementCollisionData);
+            }
+        }
+
+        private static void doExecuteMovesByCollision(
+            final LinkedList<Integer> collisions,
+            final LevelGamePlay levelGamePlay,
+            final ElementCollisionData mainElementCollisionData,
+            final ElementCollisionData otherElementCollisionData
+        ) {
+            determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+
+            // Check if staticElement will be moved outside collision-area by collision
+            final ConstantDirection otherElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
+                mainElementCollisionData,
+                otherElementCollisionData
+            );
+            if (otherElementCollisionDirection != Direction.STATIC) {
+                changeToMovingElement(otherElementCollisionData, otherElementCollisionDirection);
+                handleSingleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
+                executePlacingAndEffect(levelGamePlay, mainElementCollisionData);
+            }
+            else {
+                doExecutePlacingAndEffect(
+                    levelGamePlay,
+                    mainElementCollisionData,
+                    otherElementCollisionData
+                );
+            }
+        }
+
+        private static void executePlacingAndEffect(
+            final LevelGamePlay levelGamePlay,
+            final ElementCollisionData mainElementCollisionData
+        ) {
+            final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(
+                mainElementCollisionData
+            );
+            try {
+                if (causeCollision(otherElementCollisionData)) {
+                    determineCollisions(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+                    doExecutePlacingAndEffect(levelGamePlay, mainElementCollisionData, otherElementCollisionData);
+                }
+                else {
+                    executeNoCollision(mainElementCollisionData);
+                }
+            }
+            finally {
+                ElementCollisionData.releaseInstance(otherElementCollisionData);
+            }
+        }
+
+        private static void doExecutePlacingAndEffect(
+            LevelGamePlay levelGamePlay,
+            ElementCollisionData mainElementCollisionData,
+            ElementCollisionData otherElementCollisionData
+        ) {
+            final PlacingAfterCollision placing = determinePlacing(
+                mainElementCollisionData,
+                otherElementCollisionData
+            );
+
+            final ElementEffect effect = levelGamePlay.determineElementEffect(
+                placing,
+                mainElementCollisionData.getElement(),
+                otherElementCollisionData.getElement()
+            );
+
+            // main is already removed so no need to remove again
+            Field.removeElement(otherElementCollisionData.getIndex());
+
+            placing.execute();
+            effect.execute();
+        }
+
+        private static boolean movesBeforeCollision(
+            final LinkedList<Integer> collisions,
+            final ElementCollisionData elementCollisionData
+        ) {
+            // element is part of collisions and is not colliding with current element
+            return (collisions.remove((Integer) elementCollisionData.getIndex()) &&
+                !elementCollisionData.isColliding());
+        }
+
+        private static ConstantDirection determineDirectionOfStaticElementDueToCollision(
+            final ElementCollisionData mainElement,
+            final ElementCollisionData otherElement
+        ) {
+            if (otherElement.isColliding()) {
+                return Direction.STATIC;
+            }
+            else {
+                return mainElement.getCollision().moveOtherElementDueToCollision(mainElement, otherElement);
+            }
+        }
+
+        private static void changeToMovingElement(
+            final ElementCollisionData elementCollisionData,
+            final ConstantDirection direction
+        ) {
+            removeElement(elementCollisionData.getIndex());
+            addElement(elementCollisionData.getIndex(), elementCollisionData.getElement(), direction);
+        }
+
+        private static boolean causeCollision(final ElementCollisionData elementCollisionData) {
+            return (elementCollisionData.getElement() != null);
+        }
+
+        private static void determineCollisions(
+            final LevelGamePlay levelGamePlay,
+            final ElementCollisionData mainElementCollisionData,
+            final ElementCollisionData otherElementCollisionData
+        ) {
+            mainElementCollisionData.determineCollision(levelGamePlay, otherElementCollisionData.getElement());
+            otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
+        }
+
+        private static void executeNoCollision(final ElementCollisionData elementCollisionData) {
+            new PlacingOne(
+                elementCollisionData.calculateNextIndex(),
+                elementCollisionData.getElement(),
+                elementCollisionData.getDirection()
+            ).execute();
+        }
+
+        private static PlacingAfterCollision determinePlacing(
+            final ElementCollisionData element1,
+            final ElementCollisionData element2
+        ) {
+            assert (element1.isColliding() || element2.isColliding());
+
+            try {
+                return element1.getCollision().determinePlacing(element1, element2);
+            }
+            catch (UnsupportedOperationException e) {
+                return element2.getCollision().determinePlacing(element2, element1);
+            }
+        }
+    }
+
+    /*
      * FieldRenderer interface
      */
     public static void render(final LevelGamePlay levelGamePlay, final RenderData renderData) {
@@ -640,7 +852,7 @@ public final class Field {
             int cellIndex = collisions.removeFirst();
             assert (getElement(cellIndex) != null);
             assert (getDirection(cellIndex) != Direction.STATIC);
-            doHandleCollision(collisions, cellIndex, levelGamePlay);
+            handleSingleCollision(collisions, cellIndex, levelGamePlay);
         }
     }
 
@@ -657,7 +869,7 @@ public final class Field {
      * @param cellIndex     is index of cell that is moving and which possible collision is handled
      * @param levelGamePlay gameplay of this level
      */
-    private static void doHandleCollision(
+    private static void handleSingleCollision(
         final LinkedList<Integer> collisions,
         final int cellIndex,
         final LevelGamePlay levelGamePlay
@@ -665,81 +877,10 @@ public final class Field {
         final ElementCollisionData elementCollisionData = createMainElementCollisionData(cellIndex);
         try {
             removeElement(cellIndex);
-            executeCollision(collisions, levelGamePlay, elementCollisionData, true);
+            CollisionHandler.executeMovesBeforeCollision(collisions, levelGamePlay, elementCollisionData);
         }
         finally {
             ElementCollisionData.releaseInstance(elementCollisionData);
-        }
-    }
-
-    private static void executeCollision(
-        final LinkedList<Integer> collisions,
-        final LevelGamePlay levelGamePlay,
-        final ElementCollisionData mainElementCollisionData,
-        final boolean recursion
-    ) {
-        // Store information for other-element
-        final ElementCollisionData otherElementCollisionData = createOtherElementCollisionData(mainElementCollisionData);
-        try {
-            if (otherElementCollisionData.getElement() == null) { // No collision
-                new PlacingOne(
-                    mainElementCollisionData.calculateNextIndex(),
-                    mainElementCollisionData.getElement(),
-                    mainElementCollisionData.getDirection()
-                ).execute();
-                return;
-            }
-
-            // Check if it collides with another moving element (remove it from collisions-list in case it does)
-            if (collisions.remove((Integer) otherElementCollisionData.getIndex())) {
-                // Check if otherElement does not collide with mainElement (directions are not opposite)
-                if (!otherElementCollisionData.isMoving()) {
-                    doHandleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
-                    executeCollision(collisions, levelGamePlay, mainElementCollisionData, true);
-                    return;
-                }
-            }
-
-            // Determine collision-elements
-            mainElementCollisionData.determineCollision(levelGamePlay, otherElementCollisionData.getElement());
-            otherElementCollisionData.determineCollision(levelGamePlay, mainElementCollisionData.getElement());
-
-            // Check if staticElement will be moved outside collision-area by collision
-            if (!otherElementCollisionData.isMoving() && recursion) {
-                final ConstantDirection otherElementCollisionDirection = determineDirectionOfStaticElementDueToCollision(
-                    mainElementCollisionData,
-                    otherElementCollisionData
-                );
-                if (otherElementCollisionDirection != Direction.STATIC) {
-                    removeElement(otherElementCollisionData.getIndex());
-                    addElement(
-                        otherElementCollisionData.getIndex(),
-                        otherElementCollisionData.getElement(),
-                        otherElementCollisionDirection
-                    );
-                    doHandleCollision(collisions, otherElementCollisionData.getIndex(), levelGamePlay);
-                    executeCollision(collisions, levelGamePlay, mainElementCollisionData, false);
-                    return;
-                }
-            }
-
-            final PlacingAfterCollision placing = determinePlacing(mainElementCollisionData, otherElementCollisionData);
-
-            final ElementEffect effect = levelGamePlay.determineElementEffect(
-                placing,
-                mainElementCollisionData.getElement(),
-                otherElementCollisionData.getElement()
-            );
-
-            // Handle placing
-            // main is already removed so no need to remove again
-            removeElement(otherElementCollisionData.getIndex());
-            placing.execute();
-
-            effect.execute();
-        }
-        finally {
-            ElementCollisionData.releaseInstance(otherElementCollisionData);
         }
     }
 
@@ -759,32 +900,6 @@ public final class Field {
             staticDirection,
             (staticDirection.reverse() == elementCollisionData.getDirection())
         );
-    }
-
-    private static ConstantDirection determineDirectionOfStaticElementDueToCollision(
-        final ElementCollisionData element1,
-        final ElementCollisionData element2
-    ) {
-        if (element2.isMoving()) {
-            return element2.getDirection();
-        }
-        else {
-            return element1.getCollision().moveOtherElementDueToCollision(element1, element2);
-        }
-    }
-
-    private static PlacingAfterCollision determinePlacing(
-        final ElementCollisionData element1,
-        final ElementCollisionData element2
-    ) {
-        assert (element1.isMoving() || element2.isMoving());
-
-        try {
-            return element1.getCollision().determinePlacing(element1, element2);
-        }
-        catch (UnsupportedOperationException e) {
-            return element2.getCollision().determinePlacing(element2, element1);
-        }
     }
 
     private static void resize(final ConstantSize externalSize) {
