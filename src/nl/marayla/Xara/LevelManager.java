@@ -4,12 +4,14 @@ import nl.marayla.Xara.InputHandler.InputHandler;
 import nl.marayla.Xara.Levels.Level;
 
 import nl.marayla.Xara.LevelPlugins.SimpleLevel1;
+import org.jetbrains.annotations.Contract;
 
 final class LevelManager {
     public LevelManager(final Player player) {
         figure = new Figure(player);
     }
 
+    @Contract(" -> !null")
     public InputHandler createInputHandler() {
         return new InputHandler(figure);
     }

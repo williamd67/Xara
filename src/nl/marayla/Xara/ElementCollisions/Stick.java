@@ -1,6 +1,7 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
+import org.jetbrains.annotations.Contract;
 
 public final class Stick implements ElementCollision {
     public static final ElementCollision INSTANCE = new Stick();
@@ -70,6 +71,7 @@ public final class Stick implements ElementCollision {
         }
     }
 
+    @Contract(pure = true)
     @Override
     public final Field.ConstantDirection moveOtherElementDueToCollision(
         final ElementCollisionData thisData,
@@ -78,6 +80,7 @@ public final class Stick implements ElementCollision {
         return Field.Direction.STATIC;
     }
 
+    @Contract("_, _ -> fail")
     @Override
     public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
         final ElementCollisionData thisData,

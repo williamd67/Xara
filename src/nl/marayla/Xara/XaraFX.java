@@ -138,7 +138,7 @@ public class XaraFX extends Application {
         canvas.widthProperty().addListener( (observable) -> { canvas.onSizeChanged(); } );
         canvas.heightProperty().addListener( (observable) -> { canvas.onSizeChanged(); } );
 
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Xara");
         primaryStage.setScene(scene);
         primaryStage.show();
 

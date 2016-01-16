@@ -6,6 +6,7 @@ The goal of this project the create a very simple game-engine that can be used t
 Aim is that creating a level with specific game-play is as simple as possible.
 
 It is clearly a project in progress so there is a lot todo:
+
  *  Introduce StandardElementCollision as base-class of all standard collisions
  *  Make resulting fusion-direction part of fusion
  *  Introduce Field.RelativePosition as derived from ConstantDirection

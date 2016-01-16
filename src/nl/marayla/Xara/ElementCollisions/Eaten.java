@@ -1,6 +1,7 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
+import org.jetbrains.annotations.Contract;
 
 public final class Eaten implements ElementCollision {
     public static final ElementCollision INSTANCE = new Eaten();
@@ -54,6 +55,7 @@ public final class Eaten implements ElementCollision {
         }
     }
 
+    @Contract(pure = true)
     @Override
     public final Field.ConstantDirection moveOtherElementDueToCollision(
         final ElementCollisionData thisData,
@@ -62,6 +64,7 @@ public final class Eaten implements ElementCollision {
         return Field.Direction.STATIC;
     }
 
+    @Contract("_, _ -> fail")
     @Override
     public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
         final ElementCollisionData thisData,

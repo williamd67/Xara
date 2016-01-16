@@ -240,6 +240,7 @@ public final class Field {
             return 31 * x + y;
         }
 
+        @Contract(pure = true)
         public final String toString() {
             return "Field.Position (" + x + ", " + y + ")";
         }
