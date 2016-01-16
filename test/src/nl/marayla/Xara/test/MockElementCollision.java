@@ -18,12 +18,4 @@ class MockFuse extends Fuse {
         }
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
-        final ElementCollisionData thisData,
-        final ElementCollisionData otherData
-    ) {
-        return Field.Direction.STATIC;
-    }
 }

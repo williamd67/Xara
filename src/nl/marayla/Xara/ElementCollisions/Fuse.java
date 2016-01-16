@@ -4,7 +4,7 @@ import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 
-public abstract class Fuse implements ElementCollision {
+public abstract class Fuse extends StandardElementCollision {
     protected abstract GameElement createFusionElement(final GameElement element1, final GameElement element2);
 
     /*
@@ -64,14 +64,5 @@ public abstract class Fuse implements ElementCollision {
             );
         }
         throw new UnsupportedOperationException();
-    }
-
-    @Contract(pure = true)
-    @Override
-    public final Field.ConstantDirection moveOtherElementDueToCollision(
-        final ElementCollisionData thisData,
-        final ElementCollisionData otherData
-    ) {
-        return Field.Direction.STATIC;
     }
 }

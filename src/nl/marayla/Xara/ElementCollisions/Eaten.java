@@ -3,7 +3,7 @@ package nl.marayla.Xara.ElementCollisions;
 import nl.marayla.Xara.Field;
 import org.jetbrains.annotations.Contract;
 
-public final class Eaten implements ElementCollision {
+public final class Eaten extends StandardElementCollision {
     public static final ElementCollision INSTANCE = new Eaten();
 
     /*
@@ -53,24 +53,6 @@ public final class Eaten implements ElementCollision {
         else {
             throw new UnsupportedOperationException();
         }
-    }
-
-    @Contract(pure = true)
-    @Override
-    public final Field.ConstantDirection moveOtherElementDueToCollision(
-        final ElementCollisionData thisData,
-        final ElementCollisionData otherData
-    ) {
-        return Field.Direction.STATIC;
-    }
-
-    @Contract("_, _ -> fail")
-    @Override
-    public final Field.ConstantDirection isMovedByOtherElementDueToCollision(
-        final ElementCollisionData thisData,
-        final ElementCollisionData otherData
-    ) {
-        throw new UnsupportedOperationException();
     }
 
     private Eaten() {
