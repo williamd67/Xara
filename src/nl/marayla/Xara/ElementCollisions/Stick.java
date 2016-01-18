@@ -9,14 +9,12 @@ public final class Stick extends StandardElementCollision {
     /*
     other   -      placing    element1                      element2
                               index     element   direction index     element   direction
-    static  BOUNCE both       copy      element1  copy      copy      element2  copy
-            EAT    one        -         -         -         copy      element2  copy
+    static  EAT    one        -         -         -         copy      element2  copy
             EATEN  one        move      element1  copy      -         -         -
             PUSH   both       copy      element1  copy      copy      element2  copy
             STICK  both       copy      element1  copy      copy      element2  copy
 
-    dynamic BOUNCE both       copy      element1  copy      copy      element2  reverse
-            EAT    one        -         -         -         move      element2  copy
+    dynamic EAT    one        -         -         -         move      element2  copy
             EATEN  one        move      element1  copy      -         -         -
             PUSH   both       copy      element1  copy      copy      element2  copy
             STICK  both       copy      element1  copy      copy      element2  copy
@@ -37,16 +35,6 @@ public final class Stick extends StandardElementCollision {
                 element2.getIndex(),
                 element2.getElement(),
                 element2.getDirection()
-            );
-        }
-        else if (other == Bounce.INSTANCE) {
-            return new Field.PlacingBoth(
-                element1.getIndex(),
-                element1.getElement(),
-                element1.getDirection(),
-                element2.getIndex(),
-                element2.getElement(),
-                element2.isColliding() ? element2.getDirection().reverse() : element2.getDirection()
             );
         }
         else if (other == Eat.INSTANCE) {

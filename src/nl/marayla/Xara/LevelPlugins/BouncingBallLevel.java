@@ -40,22 +40,25 @@ public class BouncingBallLevel extends Level {
         Field.Position point1 = new Field.Position(0, 0);
         Field.Position point2 = new Field.Position(0, size.getHeight() - 1);
         for (int x = 0; x < size.getWidth(); x++) {
-            Field.addStaticElement(LevelElements.WALL, point1);
-            Field.addStaticElement(LevelElements.WALL, point2);
+            Field.addStaticElement(LevelElements.WALL_VERTICAL, point1);
+            Field.addStaticElement(LevelElements.WALL_VERTICAL, point2);
             point1.set(point1.getX() + 1, point1.getY());
             point2.set(point2.getX() + 1, point2.getY());
         }
         point1.set(0, 1);
         point2.set(size.getWidth() - 1, 1);
         for (int y = 1; y < (size.getHeight() - 1); y++) {
-            Field.addStaticElement(LevelElements.WALL, point1);
-            Field.addStaticElement(LevelElements.WALL, point2);
+            Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point1);
+            Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point2);
             point1.set(point1.getX(), point1.getY() + 1);
             point2.set(point2.getX(), point2.getY() + 1);
         }
         // TODO remove
         Random random = new Random(47);
         for (Field.Direction direction : Field.Direction.values()) {
+            if (direction == Field.Direction.STATIC) {
+                continue;
+            }
             for (int i = 0; i < 2; i++) {
                 point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
                 Field.addMovingElement(LevelElements.BALL, point1, direction);
@@ -110,7 +113,9 @@ public class BouncingBallLevel extends Level {
     protected final void setupElementCollisionResolver(
         final ElementCollisionResolver resolver
     ) {
-        resolver.addDefaultCollision(Bounce.INSTANCE);
+        resolver.addDefaultCollision(Bounce.REVERSE);
+        resolver.addElementElementCollision(Bounce.VERTICAL, LevelElements.BALL, LevelElements.WALL_HORIZONTAL);
+        resolver.addElementElementCollision(Bounce.HORIZONTAL, LevelElements.BALL, LevelElements.WALL_VERTICAL);
     }
 
     @Contract(value = "_, _, _ -> null", pure = true)
@@ -131,7 +136,8 @@ public class BouncingBallLevel extends Level {
                 return figure.getFigureGameElement();
             case BALL:
                 return new Circle(Color.rgb(255, 255, 0));
-            case WALL:
+            case WALL_VERTICAL:
+            case WALL_HORIZONTAL:
                 return new Circle(Color.rgb(164, 0, 32));
             default:
                 throw new UnsupportedOperationException();
@@ -145,7 +151,8 @@ public class BouncingBallLevel extends Level {
 
     private enum LevelElements implements GameElement {
         FIGURE,
-        WALL,
+        WALL_VERTICAL,
+        WALL_HORIZONTAL,
         BALL
     }
 

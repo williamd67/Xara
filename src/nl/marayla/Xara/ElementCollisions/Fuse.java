@@ -36,7 +36,11 @@ public abstract class Fuse extends StandardElementCollision {
         final ElementCollisionData element2
     ) {
         final ElementCollision other = element2.getCollision();
-        if ((other == Bounce.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
+        if ((other == Bounce.REVERSE) ||
+            (other == Bounce.HORIZONTAL) ||
+            (other == Bounce.VERTICAL) ||
+            (other == Push.INSTANCE) ||
+            (other == Stick.INSTANCE)) {
             return new Field.PlacingOne(
                 element1.isColliding()
                     ? Field.calculateIndex(element1.getIndex(), element1.getDirection())

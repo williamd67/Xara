@@ -8,6 +8,7 @@ Aim is that creating a level with specific game-play is as simple as possible.
 It is clearly a project in progress so there is a lot todo:
 
  *  Introduce ball (including bounce-horizontal and bounce-vertical)
+ *  Introduce Neutral element-collision and use it as default in Field.java and SimpleLevel1.java
  *  Make resulting fusion-direction part of fusion
  *  Introduce Field.RelativePosition as derived from ConstantDirection
  *  Introduce move Field in multiple directions at once (use Direction)

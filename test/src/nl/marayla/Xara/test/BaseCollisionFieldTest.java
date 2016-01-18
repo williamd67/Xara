@@ -27,7 +27,7 @@ public abstract class BaseCollisionFieldTest extends BaseFieldTest {
         collisionResolver.addDefaultCollision(Stick.INSTANCE);
         collisionResolver.addElementCollision(Eat.INSTANCE, LevelElements.EAT);
         collisionResolver.addElementCollision(Eaten.INSTANCE, LevelElements.EATEN);
-        collisionResolver.addElementCollision(Bounce.INSTANCE, LevelElements.BOUNCE);
+        collisionResolver.addElementCollision(Bounce.REVERSE, LevelElements.BOUNCE);
         collisionResolver.addElementCollision(Push.INSTANCE, LevelElements.PUSH);
         doSetupElementCollisionResolver(collisionResolver);
         return collisionResolver;

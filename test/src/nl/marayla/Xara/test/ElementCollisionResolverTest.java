@@ -358,7 +358,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
     private ElementCollision determineCollision() {
         // Stick is not used as it is the default for ElementCollisionResolver
         ElementCollision[] availableCollisions = {
-            Bounce.INSTANCE,
+            Bounce.REVERSE,
             Eat.INSTANCE,
             Eaten.INSTANCE,
             Push.INSTANCE,

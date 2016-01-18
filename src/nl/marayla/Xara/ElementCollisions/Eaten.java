@@ -9,14 +9,12 @@ public final class Eaten extends StandardElementCollision {
     /*
     other   -      placing    element1                      element2
                               index     element   direction index     element   direction
-    static  BOUNCE one        -         -         -         copy      element2  copy
-            EAT    one        -         -         -         copy      element2  copy
+    static  EAT    one        -         -         -         copy      element2  copy
             EATEN  none       -         -         -         -         -         -
             PUSH   one        -         -         -         copy      element2  copy
             STICK  one        -         -         -         copy      element2  copy
 
-    dynamic BOUNCE one        -         -         -         copy      element2  reverse
-            EAT    one        -         -         -         move      element2  copy
+    dynamic EAT    one        -         -         -         move      element2  copy
             EATEN  none       -         -         -         -         -         -
             PUSH   one        -         -         -         move      element2  copy
             STICK  one        -         -         -         move      element2  copy
@@ -31,13 +29,6 @@ public final class Eaten extends StandardElementCollision {
         final ElementCollision other = element2.getCollision();
         if (other == Eaten.INSTANCE) {
             return new Field.PlacingNone();
-        }
-        else if (other == Bounce.INSTANCE) {
-            return new Field.PlacingOne(
-                element2.getIndex(),
-                element2.getElement(),
-                element2.isColliding() ? element2.getDirection().reverse() : element2.getDirection()
-            );
         }
         else if ((other == Eat.INSTANCE) || (other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
             return new Field.PlacingOne(
