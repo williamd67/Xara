@@ -7,15 +7,16 @@ Aim is that creating a level with specific game-play is as simple as possible.
 
 It is clearly a project in progress so there is a lot todo:
 
+ *  Introduce ball (including bounce-horizontal and bounce-vertical)
  *  Make resulting fusion-direction part of fusion
  *  Introduce Field.RelativePosition as derived from ConstantDirection
  *  Introduce move Field in multiple directions at once (use Direction)
+ *  Bounce one frame delay (move element as well in frame it bounces)
  *  Rename Field.TopLinePosition with a clearer name
  *  Test all Field.TopLinePosition's with FigureGameElement
  *  Remove render-method from Field
  *  Reconnect Widener again and solve issues
  *  Introduce two (figure)GameElements connected to each other moving together (like a snake)
- *  Introduce ball (including bounce-horizontal and bounce-vertical)
  *  Introduce speed (currently everything moves with the same speed)
  *  Introduce in-between render-frames (with interpolation)
  *  Improve rendering to high frame-rate (50 FPS)
