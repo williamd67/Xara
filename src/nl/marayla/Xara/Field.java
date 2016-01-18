@@ -259,6 +259,10 @@ public final class Field {
 
         ConstantDirection reverse();
 
+        ConstantDirection reverseX();
+
+        ConstantDirection reverseY();
+
         ConstantDirection combine(final ConstantDirection direction);
 
         ConstantDirection extract(final ConstantDirection direction);
@@ -292,6 +296,18 @@ public final class Field {
         @Override
         public final ConstantDirection reverse() {
             return determineDirectionBasedOnDeltaXandDeltaY(-deltaX, -deltaY);
+        }
+
+        @Contract(pure = true)
+        @Override
+        public final ConstantDirection reverseX() {
+            return determineDirectionBasedOnDeltaXandDeltaY(-deltaX, deltaY);
+        }
+
+        @Contract(pure = true)
+        @Override
+        public final ConstantDirection reverseY() {
+            return determineDirectionBasedOnDeltaXandDeltaY(deltaX, -deltaY);
         }
 
         @Override
@@ -380,6 +396,16 @@ public final class Field {
         @Override
         public final ConstantDirection reverse() {
             return direction.reverse();
+        }
+
+        @Override
+        public final ConstantDirection reverseX() {
+            return direction.reverseX();
+        }
+
+        @Override
+        public final ConstantDirection reverseY() {
+            return direction.reverseY();
         }
 
         @Override
