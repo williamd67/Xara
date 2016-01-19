@@ -564,14 +564,6 @@ public final class Field {
     }
 
     public static void nextFrame(final LevelGamePlay levelGamePlay) {
-        if (XaraLog.DEBUG) {
-            System.out.println("hello debug");
-            XaraLog.log.d("Some tag", "Some message");
-        }
-        else {
-            System.out.println("hello no debug - error");
-            XaraLog.log.e("Some error", "Some error-message");
-        }
         frameCounter++;
         CollisionHandler.handleAllCollisions(levelGamePlay, movingCells.keySet());
         // TODO Determine when exactly to update topLine

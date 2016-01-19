@@ -1,6 +1,5 @@
 package nl.marayla.Xara.Renderer;
 
-import nl.marayla.Xara.Field;
 import nl.marayla.Xara.Platform.XaraLog;
 
 import nl.marayla.Xara.Levels.Level;
@@ -101,9 +100,9 @@ public class Renderer {
         paint.setColor(Color.rgb(255, 255, 0));
         canvas.drawCircle(center, (height / 2) - 1, paint);
 
-//      text = String.format ("%d", field.level.getBonuses()); // TODO move to level
-//      paint.setColor(Color.BLACK);
-//      canvas.drawText (text, center.x, center.y, paint);
+        text = String.format("%d", player.getScore()); // TODO move to level
+        paint.setColor(Color.BLACK);
+        canvas.drawText(text, center, paint);
 
 //      Rect textRect = area; // TODO move to level
 //      text = "Time: " + level.getTime();

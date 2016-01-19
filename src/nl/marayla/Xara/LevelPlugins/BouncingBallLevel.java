@@ -3,6 +3,7 @@ package nl.marayla.Xara.LevelPlugins;
 import java.util.Random;
 
 import nl.marayla.Xara.ElementCollisions.Bounce;
+import nl.marayla.Xara.ElementCollisions.Eaten;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.ElementEffects.NoEffect;
 import nl.marayla.Xara.ElementRenderers.Circle;
@@ -54,16 +55,13 @@ public class BouncingBallLevel extends Level {
             point2.set(point2.getX(), point2.getY() + 1);
         }
         // TODO remove
-        Random random = new Random(47);
-        for (Field.Direction direction : Field.Direction.values()) {
-            if (direction == Field.Direction.STATIC) {
-                continue;
-            }
-            for (int i = 0; i < 2; i++) {
-                point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
-                Field.addMovingElement(LevelElements.BALL, point1, direction);
-            }
+        Random random = new Random(47 + new Random().nextInt(100));
+        for (int i = 0; i < 100; i++) {
+            point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
+            Field.addStaticElement(LevelElements.BLOCK, point1);
         }
+        point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
+        Field.addMovingElement(LevelElements.BALL, point1, Field.Direction.LEFT_DOWN);
 
         SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, Field.Direction.STATIC);
         figure.setFigureGameElement(figureGameElement);
@@ -114,17 +112,21 @@ public class BouncingBallLevel extends Level {
         final ElementCollisionResolver resolver
     ) {
         resolver.addDefaultCollision(Bounce.REVERSE);
+        resolver.addElementCollision(Eaten.INSTANCE, LevelElements.BLOCK);
         resolver.addElementElementCollision(Bounce.VERTICAL, LevelElements.BALL, LevelElements.WALL_HORIZONTAL);
         resolver.addElementElementCollision(Bounce.HORIZONTAL, LevelElements.BALL, LevelElements.WALL_VERTICAL);
+        resolver.addElementElementCollision(Bounce.REVERSE, LevelElements.BALL, LevelElements.BLOCK);
     }
 
-    @Contract(value = "_, _, _ -> null", pure = true)
     @Override
     public final ElementEffect determineElementEffect(
         final Field.PlacingAfterCollision placing,
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {
+        if ((dynamicElement == LevelElements.BALL) && (staticElement == LevelElements.BLOCK)) {
+            return figure.new IncreaseScore(10);
+        }
         return NoEffect.INSTANCE;
     }
 
@@ -139,6 +141,8 @@ public class BouncingBallLevel extends Level {
             case WALL_VERTICAL:
             case WALL_HORIZONTAL:
                 return new Circle(Color.rgb(164, 0, 32));
+            case BLOCK:
+                return new Circle(Color.rgb(255, 164, 32));
             default:
                 throw new UnsupportedOperationException();
         }
@@ -153,7 +157,8 @@ public class BouncingBallLevel extends Level {
         FIGURE,
         WALL_VERTICAL,
         WALL_HORIZONTAL,
-        BALL
+        BALL,
+        BLOCK
     }
 
     private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
