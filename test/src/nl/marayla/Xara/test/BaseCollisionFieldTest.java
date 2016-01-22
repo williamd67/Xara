@@ -6,7 +6,7 @@ import nl.marayla.Xara.ElementCollisions.Eaten;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.ElementCollisions.Push;
 import nl.marayla.Xara.ElementCollisions.StandardElementCollisionResolver;
-import nl.marayla.Xara.ElementCollisions.Stick;
+import nl.marayla.Xara.ElementCollisions.Neutral;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 
@@ -24,7 +24,7 @@ public abstract class BaseCollisionFieldTest extends BaseFieldTest {
         ElementCollisionResolver collisionResolver = new StandardElementCollisionResolver(
             LevelElements.values().length
         );
-        collisionResolver.addDefaultCollision(Stick.INSTANCE);
+        collisionResolver.addDefaultCollision(Neutral.INSTANCE);
         collisionResolver.addElementCollision(Eat.INSTANCE, LevelElements.EAT);
         collisionResolver.addElementCollision(Eaten.INSTANCE, LevelElements.EATEN);
         collisionResolver.addElementCollision(Bounce.REVERSE, LevelElements.BOUNCE);
@@ -39,6 +39,13 @@ public abstract class BaseCollisionFieldTest extends BaseFieldTest {
     }
 
     protected enum LevelElements implements GameElement {
-        STATIC, EAT, EATEN, BOUNCE, PUSH, STICK, FUSE_STATIC, FUSE_DYNAMIC
+        STATIC,
+        EAT,
+        EATEN,
+        BOUNCE,
+        PUSH,
+        NEUTRAL,
+        FUSE_STATIC,
+        FUSE_DYNAMIC
     }
 }

@@ -8,7 +8,7 @@ import nl.marayla.Xara.ElementCollisions.Eaten;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.ElementCollisions.Push;
-import nl.marayla.Xara.ElementCollisions.Stick;
+import nl.marayla.Xara.ElementCollisions.Neutral;
 import nl.marayla.Xara.GameElements.GameElement;
 
 import junit.framework.TestCase;
@@ -356,13 +356,12 @@ public abstract class ElementCollisionResolverTest extends TestCase {
 
     protected abstract ElementCollisionResolver createCollisionResolver(int nrOfElements);
     private ElementCollision determineCollision() {
-        // Stick is not used as it is the default for ElementCollisionResolver
         ElementCollision[] availableCollisions = {
             Bounce.REVERSE,
             Eat.INSTANCE,
             Eaten.INSTANCE,
             Push.INSTANCE,
-            Stick.INSTANCE
+            Neutral.INSTANCE
         };
         int length = availableCollisions.length;
         ElementCollision collision = availableCollisions[random.nextInt(length)];

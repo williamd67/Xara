@@ -168,7 +168,7 @@ public class SimpleLevel1 extends Level {
     protected final void setupElementCollisionResolver(
         final ElementCollisionResolver resolver
     ) {
-        resolver.addDefaultCollision(Bounce.REVERSE);
+        resolver.addDefaultCollision(Neutral.INSTANCE);
         resolver.addElementCollision(Eat.INSTANCE, LevelElements.FIGURE);
     }
 

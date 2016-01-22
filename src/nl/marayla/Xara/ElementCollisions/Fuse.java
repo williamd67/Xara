@@ -9,26 +9,26 @@ public abstract class Fuse extends StandardElementCollision {
 
     /*
     FUSE dynamic
-    other   -      placing    element1                      element2
-                              index     element   direction index     element   direction
-    static  BOUNCE one        move      fuse      copy      -         -         -
-            EAT    one        -         -         -         copy      element2  copy
-            EATEN  one        move      element1  copy      -         -         -
-            PUSH   one        move      fuse      copy      -         -         -
-            STICK  one        move      fuse      copy      -         -         -
+    other   -       placing    element1                      element2
+                               index     element   direction index     element   direction
+    static  BOUNCE  one        move      fuse      copy      -         -         -
+            EAT     one        -         -         -         copy      element2  copy
+            EATEN   one        move      element1  copy      -         -         -
+            PUSH    one        move      fuse      copy      -         -         -
+            NEUTRAL one        move      fuse      copy      -         -         -
 
-    dynamic BOUNCE one        move      fuse      copy      -         -         -
-            EAT    one        -         -         -         move      element2  copy
-            EATEN  one        move      element1  copy      -         -         -
-            PUSH   one        move      fuse      copy      -         -         -
-            STICK  one        move      fuse      copy      -         -         -
+    dynamic BOUNCE  one        move      fuse      copy      -         -         -
+            EAT     one        -         -         -         move      element2  copy
+            EATEN   one        move      element1  copy      -         -         -
+            PUSH    one        move      fuse      copy      -         -         -
+            NEUTRAL one        move      fuse      copy      -         -         -
 
     FUSE static
-    dynamic BOUNCE one        copy      fuse      copy      -         -         -
-            EAT    one        -         -         -         move      element2  copy
-            EATEN  one        copy      element1  copy      -         -         -
-            PUSH   one        copy      fuse      copy      -         -         -
-            STICK  one        copy      fuse      copy      -         -         -
+    dynamic BOUNCE  one        copy      fuse      copy      -         -         -
+            EAT     one        -         -         -         move      element2  copy
+            EATEN   one        copy      element1  copy      -         -         -
+            PUSH    one        copy      fuse      copy      -         -         -
+            NEUTRAL one        copy      fuse      copy      -         -         -
     */
     @Override
     public final Field.PlacingAfterCollision determinePlacing(
@@ -40,7 +40,7 @@ public abstract class Fuse extends StandardElementCollision {
             (other == Bounce.HORIZONTAL) ||
             (other == Bounce.VERTICAL) ||
             (other == Push.INSTANCE) ||
-            (other == Stick.INSTANCE)) {
+            (other == Neutral.INSTANCE)) {
             return new Field.PlacingOne(
                 element1.isColliding()
                     ? Field.calculateIndex(element1.getIndex(), element1.getDirection())

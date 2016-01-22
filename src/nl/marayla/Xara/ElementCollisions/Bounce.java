@@ -18,26 +18,26 @@ public class Bounce extends StandardElementCollision {
 
     /*
     BOUNCE dynamic
-    other   -      placing    element1                      element2
-                              index     element   direction index     element   direction
-    static  BOUNCE both       copy      element1  reverse	copy      element2  copy
-            EAT    one        -         -         -         copy      element2  copy
-            EATEN  one        copy      element1  reverse   -         -         -
-            PUSH   both       copy      element1  reverse   copy      element2  copy
-            STICK  both       copy      element1  reverse   copy      element2  copy
+    other   -       placing    element1                      element2
+                               index     element   direction index     element   direction
+    static  BOUNCE  both       copy      element1  reverse	copy      element2  copy
+            EAT     one        -         -         -         copy      element2  copy
+            EATEN   one        copy      element1  reverse   -         -         -
+            PUSH    both       copy      element1  reverse   copy      element2  copy
+            NEUTRAL both       copy      element1  reverse   copy      element2  copy
 
-    dynamic	BOUNCE both       copy      element1  reverse   copy      element2  reverse
-            EAT    one        -         -         -         move      element2  copy
-            EATEN  one        copy      element1  reverse   -         -         -
-            PUSH   both       copy      element1  reverse   copy      element2  copy
-            STICK  both       copy      element1  reverse   copy      element2  copy
+    dynamic	BOUNCE  both       copy      element1  reverse   copy      element2  reverse
+            EAT     one        -         -         -         move      element2  copy
+            EATEN   one        copy      element1  reverse   -         -         -
+            PUSH    both       copy      element1  reverse   copy      element2  copy
+            NEUTRAL both       copy      element1  reverse   copy      element2  copy
 
     BOUNCE static
-    dynamic	BOUNCE both       copy      element1  copy      copy      element2  reverse
-            EAT    one        -         -         -         move      element2  copy
-            EATEN  one        copy      element1  copy      -         -         -
-            PUSH   both       copy      element1  reverse   copy      element2  copy
-            STICK  both       copy      element1  reverse   copy      element2  copy
+    dynamic	BOUNCE  both       copy      element1  copy      copy      element2  reverse
+            EAT     one        -         -         -         move      element2  copy
+            EATEN   one        copy      element1  copy      -         -         -
+            PUSH    both       copy      element1  reverse   copy      element2  copy
+            NEUTRAL both       copy      element1  reverse   copy      element2  copy
     */
     @Override
     public final Field.PlacingAfterCollision determinePlacing(
@@ -77,7 +77,7 @@ public class Bounce extends StandardElementCollision {
                 element1.isColliding() ? getBounceDirection(element1.getDirection()) : element1.getDirection()
             );
         }
-        else if ((other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
+        else if ((other == Push.INSTANCE) || (other == Neutral.INSTANCE)) {
             return new Field.PlacingBoth(
                 element1.getIndex(),
                 element1.getElement(),

@@ -45,7 +45,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         switch(collisionType) {
             case EATEN:
             case BOUNCE:
-            case STICK:
+            case NEUTRAL:
                 numberOfPositions = numberOfRenderCalls;
                 break;
             case EAT:
@@ -89,7 +89,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
                 break;
             case EATEN:
             case BOUNCE:
-            case STICK:
+            case NEUTRAL:
                 numberOfDynamicPositions = numberOfRenderCallsBeforeCollision;
                 break;
             default:
@@ -109,7 +109,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
                 numberOfRenderCalls - numberOfRenderCallsBeforeCollision
             );
         }
-        else if (collisionType == LevelElements.STICK) {
+        else if (collisionType == LevelElements.NEUTRAL) {
             addExpectedRenderPositionsStatic(
                 element,
                 current,
@@ -237,8 +237,8 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         doTestCollision(LevelElements.PUSH);
     }
 
-    public final void testStickCollision() {
-        doTestCollision(LevelElements.STICK);
+    public final void testNeutralCollision() {
+        doTestCollision(LevelElements.NEUTRAL);
     }
 
     public final void testFuseStaticCollision() {
@@ -428,7 +428,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         MockElementRenderer element = setupDynamicElement(
             initial,
             Field.Direction.RIGHT,
-            LevelElements.STICK,
+            LevelElements.NEUTRAL,
             NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
         for (int i = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION; i < NUMBER_OF_RENDER_CALLS; i++) {
@@ -465,7 +465,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         MockElementRenderer element = setupDynamicElement(
             initial,
             Field.Direction.RIGHT,
-            LevelElements.STICK,
+            LevelElements.NEUTRAL,
             NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
         for (int i = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION; i < NUMBER_OF_RENDER_CALLS; i++) {
@@ -480,7 +480,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         element = setupDynamicElement(
             initial,
             Field.Direction.LEFT_DOWN,
-            LevelElements.STICK,
+            LevelElements.NEUTRAL,
             NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
         for (int i = NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION; i < NUMBER_OF_RENDER_CALLS; i++) {

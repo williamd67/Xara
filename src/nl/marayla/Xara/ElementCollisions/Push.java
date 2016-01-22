@@ -8,17 +8,17 @@ public final class Push extends StandardElementCollision {
     public static final ElementCollision INSTANCE = new Push();
 
     /*
-    other   -      placing    element1                      element2
-                              index     element   direction index     element   direction
-    static  EAT	   one	      -         -         -         copy      element2	 copy
-            EATEN  one        move      element1  copy	    -         -         -
-            PUSH   both	      copy      element1  copy      copy      element2  copy
-            STICK  both       copy      element1  copy      copy      element2  copy
+    other   -       placing    element1                      element2
+                               index     element   direction index     element   direction
+    static  EAT	    one	      -         -         -         copy      element2	 copy
+            EATEN   one        move      element1  copy	    -         -         -
+            PUSH    both	      copy      element1  copy      copy      element2  copy
+            NEUTRAL both       copy      element1  copy      copy      element2  copy
 
-    dynamic EAT	   one        -         -         -         move      element2  copy
-            EATEN  one        move      element1  copy      -         -         -
-            PUSH   both       copy      element1  copy      copy      element2  copy
-            STICK  both       copy      element1  copy      copy      element2  copy
+    dynamic EAT	    one        -         -         -         move      element2  copy
+            EATEN   one        move      element1  copy      -         -         -
+            PUSH    both       copy      element1  copy      copy      element2  copy
+            NEUTRAL both       copy      element1  copy      copy      element2  copy
     */
     @Override
     public final Field.PlacingAfterCollision determinePlacing(
@@ -28,7 +28,7 @@ public final class Push extends StandardElementCollision {
         assert element1.isColliding();
 
         final ElementCollision other = element2.getCollision();
-        if ((other == Push.INSTANCE) || (other == Stick.INSTANCE)) {
+        if ((other == Push.INSTANCE) || (other == Neutral.INSTANCE)) {
             return new Field.PlacingBoth(
                 element1.getIndex(),
                 element1.getElement(),
@@ -72,7 +72,7 @@ public final class Push extends StandardElementCollision {
             (other == Bounce.HORIZONTAL) ||
             (other == Bounce.VERTICAL) ||
             (other == Push.INSTANCE) ||
-            (other == Stick.INSTANCE)) {
+            (other == Neutral.INSTANCE)) {
             return thisData.getDirection();
         }
         else if ((other == Eat.INSTANCE) || (other == Eaten.INSTANCE)) {

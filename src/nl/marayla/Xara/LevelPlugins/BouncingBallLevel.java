@@ -5,6 +5,7 @@ import java.util.Random;
 import nl.marayla.Xara.ElementCollisions.Bounce;
 import nl.marayla.Xara.ElementCollisions.Eaten;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
+import nl.marayla.Xara.ElementCollisions.Neutral;
 import nl.marayla.Xara.ElementEffects.NoEffect;
 import nl.marayla.Xara.ElementRenderers.Circle;
 import nl.marayla.Xara.Field;
@@ -111,7 +112,7 @@ public class BouncingBallLevel extends Level {
     protected final void setupElementCollisionResolver(
         final ElementCollisionResolver resolver
     ) {
-        resolver.addDefaultCollision(Bounce.REVERSE);
+        resolver.addDefaultCollision(Neutral.INSTANCE);
         resolver.addElementCollision(Eaten.INSTANCE, LevelElements.BLOCK);
         resolver.addElementElementCollision(Bounce.VERTICAL, LevelElements.BALL, LevelElements.WALL_HORIZONTAL);
         resolver.addElementElementCollision(Bounce.HORIZONTAL, LevelElements.BALL, LevelElements.WALL_VERTICAL);

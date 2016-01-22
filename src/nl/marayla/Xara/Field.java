@@ -9,7 +9,6 @@ import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.LevelGamePlay;
-import nl.marayla.Xara.Platform.XaraLog;
 import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsBottom;
 import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsTop;
 import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsLeft;

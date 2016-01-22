@@ -7,17 +7,17 @@ public final class Eat extends StandardElementCollision {
     public static final ElementCollision INSTANCE = new Eat();
 
     /*
-    other   -      placing    element1                      element2
-                              index     element   direction index     element   direction
-    static  EAT    none       -         -         -         -         -         -
-            EATEN  one        move      element1  copy      -         -         -
-            PUSH   one        move      element1  copy      -         -         -
-            STICK  one        move      element1  copy      -         -         -
+    other   -       placing    element1                      element2
+                               index     element   direction index     element   direction
+    static  EAT     none       -         -         -         -         -         -
+            EATEN   one        move      element1  copy      -         -         -
+            PUSH    one        move      element1  copy      -         -         -
+            NEUTRAL one        move      element1  copy      -         -         -
 
-    dynamic	EAT    none       -         -         -         -         -         -
-            EATEN  one        move      element1  copy      -         -         -
-            PUSH   one        move      element1  copy      -         -         -
-            STICK  one        move      element1  copy      -         -         -
+    dynamic	EAT     none       -         -         -         -         -         -
+            EATEN   one        move      element1  copy      -         -         -
+            PUSH    one        move      element1  copy      -         -         -
+            Neutral one        move      element1  copy      -         -         -
     */
     @Override
     public final Field.PlacingAfterCollision determinePlacing(
@@ -32,7 +32,7 @@ public final class Eat extends StandardElementCollision {
         }
         else if ((other == Eaten.INSTANCE) ||
             (other == Push.INSTANCE) ||
-            (other == Stick.INSTANCE)) {
+            (other == Neutral.INSTANCE)) {
             return new Field.PlacingOne(
                 Field.calculateIndex(element1.getIndex(), element1.getDirection()),
                 element1.getElement(),

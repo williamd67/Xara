@@ -11,7 +11,7 @@ public abstract class ElementCollisionResolver {
     @SuppressWarnings("serial")
     public static class InvalidOrderException extends RuntimeException { }
 
-    public static final ElementCollision DEFAULT = Stick.INSTANCE;
+    public static final ElementCollision DEFAULT = Neutral.INSTANCE;
 
     public ElementCollisionResolver(final int numberOfElements) {
         this.numberOfElements = numberOfElements;
