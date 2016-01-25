@@ -7,7 +7,7 @@ Aim is that creating a level with specific game-play is as simple as possible.
 
 It is clearly a project in progress so there is a lot todo:
 
- *  Introduce ball (including bounce-horizontal and bounce-vertical)
+ *  Introduce reading of bitmap to create level
  *  Make resulting fusion-direction part of fusion
  *  Introduce Field.RelativePosition as derived from ConstantDirection
  *  Introduce move Field in multiple directions at once (use Direction)
@@ -21,7 +21,6 @@ It is clearly a project in progress so there is a lot todo:
  *  Introduce in-between render-frames (with interpolation)
  *  Improve rendering to high frame-rate (50 FPS)
  *    Possible solution: create bitmap with all static GameElement's and reuse bitmap</li>
- *  Introduce reading of bitmap to create level
  *  Introduce proper documentation (JavaDoc)
  *  Introduce proper count-down GameState to start level
  *  Make InputHandler level-dependent
