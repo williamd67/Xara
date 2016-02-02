@@ -428,7 +428,7 @@ public final class Field {
     /*
      * TopLinePosition
      */
-    public enum TopLinePosition {
+    private enum TopLinePosition {
         NONE,
         TOP,
         BOTTOM,
@@ -537,11 +537,8 @@ public final class Field {
         return calculateIndex(index, new Position(direction.getDeltaX(), direction.getDeltaY()));
     }
 
-    public static void initialize(
-        final ConstantSize visibleSize,
-        final TopLinePosition topLinePosition
-    ) {
-        setTopLinePosition(topLinePosition);
+    public static void initialize(final ConstantSize visibleSize, final ConstantDirection direction) {
+        setDirection(direction);
         resize(new Size(visibleSize.getWidth() + 2, visibleSize.getHeight() + 2));
         topLine = 0;
         frameCounter = 0;
@@ -689,26 +686,29 @@ public final class Field {
         movingCells.clear();
     }
 
-    private static void setTopLinePosition(final TopLinePosition inputTopLinePosition) {
-        topLinePosition = inputTopLinePosition;
-        switch (topLinePosition) {
-            case NONE:
-                renderCells = new RenderCellsTop();
-                break;
-            case TOP:
-                renderCells = new RenderCellsTop();
-                break;
-            case BOTTOM:
-                renderCells = new RenderCellsBottom();
-                break;
-            case LEFT:
-                renderCells = new RenderCellsLeft();
-                break;
-            case RIGHT:
-                renderCells = new RenderCellsRight();
-                break;
-            default:
-                throw new UnsupportedOperationException();
+    private static void setDirection(final ConstantDirection direction) {
+        if (direction == Direction.STATIC) {
+            topLinePosition = TopLinePosition.NONE;
+            renderCells = new RenderCellsTop();
+        }
+        else if (direction == Direction.DOWN) {
+            topLinePosition = TopLinePosition.TOP;
+            renderCells = new RenderCellsTop();
+        }
+        else if (direction == Direction.UP) {
+            topLinePosition = TopLinePosition.BOTTOM;
+            renderCells = new RenderCellsBottom();
+        }
+        else if (direction == Direction.RIGHT) {
+            topLinePosition = TopLinePosition.LEFT;
+            renderCells = new RenderCellsLeft();
+        }
+        else if (direction == Direction.LEFT) {
+            topLinePosition = TopLinePosition.RIGHT;
+            renderCells = new RenderCellsRight();
+        }
+        else {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -728,6 +728,7 @@ public final class Field {
     private static int topLine;
     private static int topLineSize;
     private static int maxTopLine;
+    private static ConstantDirection direction;
     private static int frameCounter;
 
     // Hide constructor

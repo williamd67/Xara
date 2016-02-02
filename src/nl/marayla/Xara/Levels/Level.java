@@ -4,7 +4,6 @@ import nl.marayla.Xara.Field;
 import nl.marayla.Xara.Figure;
 import nl.marayla.Xara.LevelRenderer;
 import nl.marayla.Xara.LevelRendererCreator;
-import nl.marayla.Xara.Renderer.ConstantRectangle;
 import nl.marayla.Xara.Renderer.RenderData;
 import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
@@ -47,7 +46,7 @@ public abstract class Level implements LevelGamePlay {
     }
 
     public final void initialize() {
-        Field.initialize(getSize(), getTopLinePosition());
+        Field.initialize(getSize(), getFieldDirection());
         figure.initialize(getFigureMinArea(), getFigureMaxArea());
 
         time = initialTime();
@@ -94,7 +93,8 @@ public abstract class Level implements LevelGamePlay {
     protected abstract ElementRenderer createElementRenderer(GameElement element);
     protected abstract void setupElementCollisionResolver(ElementCollisionResolver resolver);
     protected abstract GameElement[] getLevelElements();
-    protected abstract Field.TopLinePosition getTopLinePosition();
+
+    protected abstract Field.ConstantDirection getFieldDirection();
     protected abstract Field.ConstantPosition getFigurePosition();
     protected abstract Field.ConstantPosition getFigureMinArea();
     protected abstract Field.ConstantPosition getFigureMaxArea();

@@ -165,7 +165,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
 
     private void setupGameElements(final LevelElements collisionType) {
         final int numberOfCallsAfterCollision = (NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION);
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
         for (Field.Direction direction : Field.Direction.values()) {
             if (direction == Field.Direction.STATIC) {
                 continue;
@@ -203,7 +203,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
     }
 
     public final void testNoCollision() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         MockElementRenderer element = new MockElementRenderer();
         addElement(element);
@@ -250,7 +250,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
     }
 
     public final void testPushCollisionIntoOther() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
         Field.ConstantDirection direction = Field.Direction.RIGHT;
 
         // static that will be pushed
@@ -350,7 +350,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *      RIGHT   UP(INITIAL_POINT)
      */
     public final void testDynamicElementCircle() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         // dynamic with Field.Direction.RIGHT
         setupDynamicElement(
@@ -388,7 +388,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *      RIGHT   STATIC(INITIAL_POINT)
      */
     public final void testDynamicDynamicStaticCollisionWhereSecondIsEaten() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         // dynamic with Field.Direction.RIGHT
         setupDynamicElement(
@@ -421,7 +421,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *      RIGHT   STATIC(INITIAL_POINT)
      */
     public final void testDynamicDynamicStaticCollisionWhereSecondStopsMoving() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         // dynamic with Field.Direction.RIGHT
         Field.Position initial = new Field.Position(INITIAL_POINT.getX() - 1, INITIAL_POINT.getY());
@@ -458,7 +458,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *      RIGHT   STATIC(INITIAL_POINT)
      */
     public final void testDynamicDynamicStaticCollisionWhereAllStopsMoving() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         // dynamic with Field.Direction.RIGHT
         Field.Position initial = new Field.Position(INITIAL_POINT.getX() - 1, INITIAL_POINT.getY());
@@ -499,7 +499,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *      RIGHT   STATIC(INITIAL_POINT)   UP
      */
     public final void testStaticPushedIntoDynamic() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         // dynamic with Field.Direction.RIGHT
         Field.ConstantDirection direction = Direction.RIGHT;
@@ -537,7 +537,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
             NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
 
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         Field.Direction [] directions = { Direction.LEFT, Direction.RIGHT };
         for (Field.Direction direction : directions) { // Field.Direction.values()) {
@@ -612,7 +612,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         final int numberOfCallsAfterCollision = (
             NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
         );
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         for (Field.Direction direction : Field.Direction.values()) {
             if (direction == Field.Direction.STATIC) {
@@ -679,7 +679,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
     }
 
     public final void testDynamicCircleWithCollision() {
-        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.TopLinePosition.NONE);
+        Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
         final int numberOfRenderCallsBeforeCollision = 2;
         final int numberOfRenderCalls = 3;

@@ -83,8 +83,8 @@ public class SimpleLevel1 extends Level {
 
     @Contract(pure = true)
     @Override
-    protected final Field.TopLinePosition getTopLinePosition() {
-        return Field.TopLinePosition.TOP;
+    protected final Field.ConstantDirection getFieldDirection() {
+        return Field.Direction.DOWN;
     }
 
     @Contract(" -> !null")
@@ -108,27 +108,8 @@ public class SimpleLevel1 extends Level {
     @Override
     protected final void doInitialize() {
         bonuses = 5;
-        Field.ConstantDirection direction = Field.Direction.STATIC;
-        switch (getTopLinePosition()) {
-            case NONE:
-                // No change
-                break;
-            case TOP:
-                direction = Field.Direction.UP;
-                break;
-            case BOTTOM:
-                direction = Field.Direction.DOWN;
-                break;
-            case LEFT:
-                direction = Field.Direction.LEFT;
-                break;
-            case RIGHT:
-                direction = Field.Direction.RIGHT;
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-        SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, direction);
+
+        SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, getFieldDirection().reverse());
         figure.setFigureGameElement(figureGameElement);
         Field.addMovingElement(LevelElements.FIGURE, getFigurePosition(), figureGameElement.getDirection());
 
@@ -146,8 +127,8 @@ public class SimpleLevel1 extends Level {
         frameEffect.execute();
         int topLineSize = size.getWidth();
         if (
-            (getTopLinePosition() == Field.TopLinePosition.LEFT)
-            || (getTopLinePosition() == Field.TopLinePosition.RIGHT)
+            (getFieldDirection() == Field.Direction.LEFT)
+                || (getFieldDirection() == Field.Direction.RIGHT)
         ) {
             topLineSize = size.getHeight();
         }

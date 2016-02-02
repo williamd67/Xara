@@ -1,8 +1,6 @@
 package nl.marayla.Xara.test;
 
-import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.Field;
-import nl.marayla.Xara.ElementCollisions.ElementCollision;
 import nl.marayla.Xara.GameElements.GameElement;
 
 import junit.framework.TestCase;
@@ -14,32 +12,32 @@ public class FieldNextFrameTest extends TestCase {
     }
 
     public final void testNoneBorderCleanup() {
-        initializeField(Field.TopLinePosition.NONE);
+        initializeField(Field.Direction.STATIC);
         doTestBorderCleanup(0, FIELD_SIZE - 1);
     }
 
     public final void testTopBorderCleanup() {
-        doTestDynamicBorderCleanup(Field.TopLinePosition.TOP);
+        doTestDynamicBorderCleanup(Field.Direction.DOWN);
     }
 
     public final void testBottomBorderCleanup() {
-        doTestDynamicBorderCleanup(Field.TopLinePosition.BOTTOM);
+        doTestDynamicBorderCleanup(Field.Direction.UP);
     }
 
     public final void testLeftBorderCleanup() {
-        doTestDynamicBorderCleanup(Field.TopLinePosition.LEFT);
+        doTestDynamicBorderCleanup(Field.Direction.RIGHT);
     }
 
     public final void testRightBorderCleanup() {
-        doTestDynamicBorderCleanup(Field.TopLinePosition.RIGHT);
+        doTestDynamicBorderCleanup(Field.Direction.LEFT);
     }
 
-    private void initializeField(final Field.TopLinePosition topLinePosition) {
-        Field.initialize(new Field.Size(FIELD_SIZE - 2, FIELD_SIZE - 2), topLinePosition);
+    private void initializeField(final Field.ConstantDirection fieldDirection) {
+        Field.initialize(new Field.Size(FIELD_SIZE - 2, FIELD_SIZE - 2), fieldDirection);
     }
 
-    private void doTestDynamicBorderCleanup(final Field.TopLinePosition topLinePosition) {
-        initializeField(topLinePosition);
+    private void doTestDynamicBorderCleanup(final Field.ConstantDirection fieldDirection) {
+        initializeField(fieldDirection);
         doTestBorderCleanup(FIELD_SIZE - 1, FIELD_SIZE - 2);
     }
 

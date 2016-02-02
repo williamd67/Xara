@@ -86,8 +86,8 @@ public class BouncingBallLevel extends Level {
 
     @Contract(pure = true)
     @Override
-    protected final Field.TopLinePosition getTopLinePosition() {
-        return Field.TopLinePosition.NONE;
+    protected final Field.ConstantDirection getFieldDirection() {
+        return Field.Direction.STATIC;
     }
 
     @Contract(" -> !null")
