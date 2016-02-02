@@ -538,11 +538,11 @@ public final class Field {
     }
 
     public static void initialize(
-        final ConstantSize externalSize,
+        final ConstantSize visibleSize,
         final TopLinePosition topLinePosition
     ) {
         setTopLinePosition(topLinePosition);
-        resize(externalSize);
+        resize(new Size(visibleSize.getWidth() + 2, visibleSize.getHeight() + 2));
         topLine = 0;
         frameCounter = 0;
     }
@@ -576,7 +576,7 @@ public final class Field {
         final ColorToElement colorToElement,
         final ColorToDirection colorToDirection
     ) {
-        resize(new Field.Size(image.getWidth() - 2, image.getHeight() - 2));
+        resize(new Size(image.getWidth(), image.getHeight()));
 
         final int[] colorArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         Field.Position point = new Field.Position(0, 0);
@@ -660,8 +660,8 @@ public final class Field {
         return index;
     }
 
-    private static void resize(final ConstantSize externalSize) {
-        arraySize.set(externalSize.getWidth() + 2, externalSize.getHeight() + 2);
+    private static void resize(final ConstantSize size) {
+        arraySize.set(size.getWidth(), size.getHeight());
         createCells();
 
         switch (topLinePosition) {
