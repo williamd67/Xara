@@ -1,5 +1,6 @@
 package nl.marayla.Xara;
 
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -435,6 +436,14 @@ public final class Field {
         RIGHT
     }
 
+    public interface ColorToElement {
+        GameElement transform(final int rgb);
+    }
+
+    public interface ColorToDirection {
+        ConstantDirection transform(final int rgb);
+    }
+
     /*
      * FieldRenderer interface
      */
@@ -481,6 +490,24 @@ public final class Field {
         }
     }
 
+    private static int calculateIndex(final ConstantPosition internalPosition) {
+        int index;
+        switch (topLinePosition) {
+            case NONE:
+            case TOP:
+            case BOTTOM:
+                index = internalPosition.getX() + (internalPosition.getY() * topLineSize);
+                break;
+            case LEFT:
+            case RIGHT:
+                index = internalPosition.getY() + (internalPosition.getX() * topLineSize);
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+        return index;
+    }
+
     private static int calculateIndex(final int index, final ConstantPosition relativePosition) {
         int result;
         switch (topLinePosition) {
@@ -516,24 +543,6 @@ public final class Field {
     ) {
         setTopLinePosition(topLinePosition);
         resize(externalSize);
-        switch (topLinePosition) {
-            case NONE:
-                topLineSize = arraySize.getWidth();
-                maxTopLine = arraySize.getHeight();
-                break;
-            case TOP:
-            case BOTTOM:
-                topLineSize = arraySize.getWidth();
-                maxTopLine = arraySize.getHeight();
-                break;
-            case LEFT:
-            case RIGHT:
-                topLineSize = arraySize.getHeight();
-                maxTopLine = arraySize.getWidth();
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
         topLine = 0;
         frameCounter = 0;
     }
@@ -562,6 +571,32 @@ public final class Field {
         addDirection(index, direction);
     }
 
+    public static void initializeFromImage(
+        final BufferedImage image,
+        final ColorToElement colorToElement,
+        final ColorToDirection colorToDirection
+    ) {
+        resize(new Field.Size(image.getWidth() - 2, image.getHeight() - 2));
+
+        final int[] colorArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+        Field.Position point = new Field.Position(0, 0);
+        int index = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                final int color = (colorArray[index++] & 0x00FFFFFF);
+                if (color == 0) {
+                    continue;
+                }
+                point.set(x, y);
+                addElement(
+                    calculateIndex(point),
+                    colorToElement.transform(color),
+                    colorToDirection.transform(color)
+                );
+            }
+        }
+    }
+
     public static void nextFrame(final LevelGamePlay levelGamePlay) {
         frameCounter++;
         CollisionHandler.handleAllCollisions(levelGamePlay, movingCells.keySet());
@@ -572,6 +607,8 @@ public final class Field {
             }
             topLine--;
         }
+        // TODO Determine when to remove side bars; maybe only clean topLine
+        /*
         // Remove first row
         int line = topLine * topLineSize;
         for (int cell = 1; cell < (topLineSize - 1); cell++) {
@@ -593,6 +630,7 @@ public final class Field {
             cellIndex += (topLineSize - 1);
             removeElement(cellIndex);
         }
+        */
     }
 
     @Contract(pure = true)
@@ -613,21 +651,8 @@ public final class Field {
     }
 
     private static int doAddElement(final GameElement element, final ConstantPosition externalPosition) {
-        int index;
         final ConstantPosition internalPosition = externalToInternalPosition(externalPosition);
-        switch (topLinePosition) {
-            case NONE:
-            case TOP:
-            case BOTTOM:
-                index = internalPosition.getX() + (internalPosition.getY() * topLineSize);
-                break;
-            case LEFT:
-            case RIGHT:
-                index = internalPosition.getY() + (internalPosition.getX() * topLineSize);
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
+        final int index = calculateIndex(internalPosition);
         if (cells[index] != null) {
             removeElement(index);
         }
@@ -638,6 +663,25 @@ public final class Field {
     private static void resize(final ConstantSize externalSize) {
         arraySize.set(externalSize.getWidth() + 2, externalSize.getHeight() + 2);
         createCells();
+
+        switch (topLinePosition) {
+            case NONE:
+                topLineSize = arraySize.getWidth();
+                maxTopLine = arraySize.getHeight();
+                break;
+            case TOP:
+            case BOTTOM:
+                topLineSize = arraySize.getWidth();
+                maxTopLine = arraySize.getHeight();
+                break;
+            case LEFT:
+            case RIGHT:
+                topLineSize = arraySize.getHeight();
+                maxTopLine = arraySize.getWidth();
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     private static void createCells() {

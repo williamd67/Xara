@@ -54,49 +54,27 @@ public class FileBasedLevel extends Level {
 
     @Contract(pure = true)
     private static Field.ConstantDirection translateRGBToDirection(final int rgb) {
-        if ((rgb & 0x00FF00) == 0) { // No moving object
-            return Field.Direction.STATIC;
-        }
-
-        final int red = rgb >> 16;
-        final int blue = rgb & 0xFF;
-        if (red == 0xF0) { // Right
-            if (blue == 0xF0) { // Up
-                return Field.Direction.RIGHT_UP;
-            }
-            else if (blue == 0x80) { // Down
-                return Field.Direction.RIGHT_DOWN;
-            }
-            else if (blue == 0x00) { // Neutral
+        switch (rgb) {
+            case 0xF08000:
                 return Field.Direction.RIGHT;
-            }
-            throw new UnsupportedOperationException();
-        }
-        else if (red == 0x80) { // Left
-            if (blue == 0xF0) { // Up
-                return Field.Direction.LEFT_UP;
-            }
-            else if (blue == 0x80) { // Down
-                return Field.Direction.LEFT_DOWN;
-            }
-            else if (blue == 0x00) { // Neutral
+            case 0xF08080:
+                return Field.Direction.RIGHT_DOWN;
+            case 0xF080F0:
+                return Field.Direction.RIGHT_UP;
+            case 0x808000:
                 return Field.Direction.LEFT;
-            }
-            throw new UnsupportedOperationException();
-        }
-        else if (red == 0x00) { // Neutral
-            if (blue == 0xF0) { // Up
-                return Field.Direction.UP;
-            }
-            else if (blue == 0x80) { // Down
+            case 0x808080:
+                return Field.Direction.LEFT_DOWN;
+            case 0x8080F0:
+                return Field.Direction.LEFT_UP;
+            case 0x008080:
                 return Field.Direction.DOWN;
-            }
-            else if (blue == 0x00) { // Neutral
+            case 0x0080F0:
+                return Field.Direction.UP;
+            case 0x008000:
+            default:
                 return Field.Direction.STATIC;
-            }
-            throw new UnsupportedOperationException();
         }
-        throw new UnsupportedOperationException();
     }
 
     @Contract(pure = true)
@@ -115,29 +93,17 @@ public class FileBasedLevel extends Level {
 
     @Override
     protected final void doInitialize() {
-        final int[] colorArray = image.getRGB(0, 0, size.getWidth(), size.getHeight(), null, 0, image.getWidth());
-        Field.Position point = new Field.Position(0, 0);
-        int index = 0;
         try {
-            for (int y = 0; y < size.getHeight(); y++) {
-                for (int x = 0; x < size.getWidth(); x++) {
-                    final int color = (colorArray[index++] & 0x00FFFFFF);
-                    if (color == 0) {
-                        continue;
-                    }
-                    point.set(x, y);
-                    Field.addMovingElement(
-                        translateRGBToElement(color),
-                        point,
-                        translateRGBToDirection(color)
-                    );
-                }
-            }
-            image = null;
+            Field.initializeFromImage(
+                image,
+                FileBasedLevel::translateRGBToElement,
+                FileBasedLevel::translateRGBToDirection
+            );
         }
         catch (Exception e) {
             System.out.println("uncaught exception: " + e.getMessage());
         }
+
         SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, Field.Direction.STATIC);
         figure.setFigureGameElement(figureGameElement);
     }
@@ -238,6 +204,6 @@ public class FileBasedLevel extends Level {
     }
 
     private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
-    private Field.ConstantSize size;
+    private Field.ConstantSize size = new Field.Size(0, 0);
     private BufferedImage image;
 }
