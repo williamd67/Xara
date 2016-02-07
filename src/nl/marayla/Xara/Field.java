@@ -10,11 +10,6 @@ import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.LevelGamePlay;
-import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsBottom;
-import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsTop;
-import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsLeft;
-import nl.marayla.Xara.Renderer.CellRenderer.RenderCellsRight;
-import nl.marayla.Xara.Renderer.CellRenderer.RenderCells;
 import nl.marayla.Xara.Renderer.RenderData;
 import org.jetbrains.annotations.Contract;
 
@@ -212,6 +207,11 @@ public final class Field {
             return y;
         }
 
+        public final void add(final ConstantDirection direction) {
+            x += direction.getDeltaX();
+            y += direction.getDeltaY();
+        }
+
         public final void set(final int x, final int y) {
             this.x = x;
             this.y = y;
@@ -266,6 +266,8 @@ public final class Field {
         ConstantDirection combine(final ConstantDirection direction);
 
         ConstantDirection extract(final ConstantDirection direction);
+
+        ConstantDirection perpendicular();
     }
 
     /*
@@ -324,6 +326,11 @@ public final class Field {
                 (deltaX == direction.getDeltaX()) ? 0 : deltaX, // if x-direction equal extract else do not change
                 (deltaY == direction.getDeltaY()) ? 0 : deltaY  // if y-direction equal extract else do not change
             );
+        }
+
+        @Override
+        public final ConstantDirection perpendicular() {
+            return determineDirectionBasedOnDeltaXandDeltaY(deltaY, -deltaX);
         }
 
         Direction(final int deltaX, final int deltaY) {
@@ -418,22 +425,16 @@ public final class Field {
             return this.direction.extract(direction);
         }
 
+        @Override
+        public final ConstantDirection perpendicular() {
+            return this.direction.perpendicular();
+        }
+
         public final void update(final ConstantDirection direction) {
             this.direction = direction;
         }
 
         private ConstantDirection direction = Direction.STATIC;
-    }
-
-    /*
-     * TopLinePosition
-     */
-    private enum TopLinePosition {
-        NONE,
-        TOP,
-        BOTTOM,
-        LEFT,
-        RIGHT
     }
 
     public interface ColorToElement {
@@ -448,8 +449,31 @@ public final class Field {
      * FieldRenderer interface
      */
     public static void render(final LevelGamePlay levelGamePlay, final RenderData renderData) {
-        if (renderCells != null) {
-            renderCells.render(levelGamePlay, cells, arraySize, topLine, renderData);
+        final int index = calculateIndex(startPositionVisibleArea);
+        final int cellLineWidth = size.getWidth();
+        final int startColumnIndex = index % cellLineWidth;
+        int rowIndex = (index / cellLineWidth) * cellLineWidth;
+
+        Field.Position position = new Field.Position(0, 0);
+        for (int y = 0; y < size.getHeight() - 2; y++) {
+            int columnIndex = startColumnIndex;
+
+            for (int x = 0; x < size.getWidth() - 2; x++) {
+                final GameElement element = cells[rowIndex + columnIndex];
+                if (element != null) {
+                    position.set(x, y);
+                    levelGamePlay.renderElement(element, renderData, position);
+                }
+
+                columnIndex++;
+                if (columnIndex >= cellLineWidth) {
+                    columnIndex = 0;
+                }
+            }
+            rowIndex += cellLineWidth;
+            if (rowIndex >= cells.length) {
+                rowIndex = 0;
+            }
         }
     }
 
@@ -490,82 +514,68 @@ public final class Field {
         }
     }
 
-    private static int calculateIndex(final ConstantPosition internalPosition) {
-        int index;
-        switch (topLinePosition) {
-            case NONE:
-            case TOP:
-            case BOTTOM:
-                index = internalPosition.getX() + (internalPosition.getY() * topLineSize);
-                break;
-            case LEFT:
-            case RIGHT:
-                index = internalPosition.getY() + (internalPosition.getX() * topLineSize);
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
+    public static void addElementTopLine(final GameElement element, final int visibleOffset) {
+        doAddElement(element, new Position(
+            addTopLineDirection.getDeltaX() * visibleOffset + addTopLinePosition.getX(),
+            addTopLineDirection.getDeltaY() * visibleOffset + addTopLinePosition.getY()
+        ));
+    }
+
+    public static void addStaticElement(
+        final GameElement element,
+        final ConstantPosition visiblePosition
+    ) {
+        doAddElement(element, visiblePosition);
+    }
+
+    public static void addMovingElement(
+        final GameElement element,
+        final ConstantPosition visiblePosition,
+        final ConstantDirection direction
+    ) {
+        final int index = doAddElement(element, visiblePosition);
+        addDirection(index, direction);
+    }
+
+    private static int doAddElement(final GameElement element, final ConstantPosition visiblePosition) {
+        final int index = calculateIndex(
+            moveX(startPositionVisibleArea.getX(), visiblePosition.getX()),
+            moveY(startPositionVisibleArea.getY(), visiblePosition.getY())
+        );
+        removeElement(index);
+        addElement(index, element, Direction.STATIC);
         return index;
     }
 
-    private static int calculateIndex(final int index, final ConstantPosition relativePosition) {
-        int result;
-        switch (topLinePosition) {
-            case NONE:
-            case TOP:
-            case BOTTOM:
-                result = index + relativePosition.getX() + (relativePosition.getY() * topLineSize);
-                break;
-            case LEFT:
-            case RIGHT:
-                result = index + relativePosition.getY() + (relativePosition.getX() * topLineSize);
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-        if (result < 0) {
+    private static int doCalculateIndex(final int current, final int row, final int column) {
+        int result = current + row + column * size.getWidth();
+        while (result < 0) {
             result += cells.length;
         }
-        else if (result >= cells.length) {
+        while (result >= cells.length) {
             result -= cells.length;
         }
         return result;
     }
 
+    private static int calculateIndex(final int row, final int column) {
+        return doCalculateIndex(0, row, column);
+    }
+
+    private static int calculateIndex(final ConstantPosition position) {
+        return doCalculateIndex(0, position.getX(), position.getY());
+    }
+
     // TODO: determine if this method should be static
-    public static int calculateIndex(final int index, final ConstantDirection direction) {
-        return calculateIndex(index, new Position(direction.getDeltaX(), direction.getDeltaY()));
+    public static int calculateIndex(final int current, final ConstantDirection direction) {
+        return doCalculateIndex(current, direction.getDeltaX(), direction.getDeltaY());
     }
 
     public static void initialize(final ConstantSize visibleSize, final ConstantDirection direction) {
         setDirection(direction);
         resize(new Size(visibleSize.getWidth() + 2, visibleSize.getHeight() + 2));
-        topLine = 0;
+        startPositionVisibleArea = new Position(1, 1);
         frameCounter = 0;
-    }
-
-    public static void addElementTopLine(final GameElement element, final int externalPosition) {
-        int internalPosition = externalToInternalPosition(externalPosition);
-        assert (internalPosition < topLineSize);
-        int index = (topLine * topLineSize) + internalPosition;
-        removeElement(index);
-        addElement(index, element, Direction.STATIC);
-    }
-
-    public static void addStaticElement(
-        final GameElement element,
-        final ConstantPosition externalPosition
-    ) {
-        doAddElement(element, externalPosition);
-    }
-
-    public static void addMovingElement(
-        final GameElement element,
-        final ConstantPosition externalPosition,
-        final ConstantDirection direction
-    ) {
-        int index = doAddElement(element, externalPosition);
-        addDirection(index, direction);
     }
 
     public static void initializeFromImage(
@@ -597,47 +607,35 @@ public final class Field {
     public static void nextFrame(final LevelGamePlay levelGamePlay) {
         frameCounter++;
         CollisionHandler.handleAllCollisions(levelGamePlay, movingCells.keySet());
-        // TODO Determine when exactly to update topLine
-        if (topLinePosition != Field.TopLinePosition.NONE) {
-            if (topLine == 0) {
-                topLine = maxTopLine;
-            }
-            topLine--;
-        }
-        // TODO Determine when to remove side bars; maybe only clean topLine
-        /*
-        // Remove first row
-        int line = topLine * topLineSize;
-        for (int cell = 1; cell < (topLineSize - 1); cell++) {
-            removeElement(line + cell);
-        }
-        // remove last row
-        line -= topLineSize;
-        if (line < 0) {
-            line += cells.length;
-        }
-        for (int cell = 1; cell < (topLineSize - 1); cell++) {
-            removeElement(line + cell);
-        }
-        // Remove all elements in the first and last column
-        int cellIndex = -1;
-        for (int rows = 0; rows < maxTopLine; rows++) {
-            cellIndex++;
-            removeElement(cellIndex);
-            cellIndex += (topLineSize - 1);
-            removeElement(cellIndex);
-        }
-        */
+        move();
     }
 
-    @Contract(pure = true)
-    private static int externalToInternalPosition(final int externalPosition) {
-        return externalPosition + 1;
+    private static void move() {
+        startPositionVisibleArea = new Position(
+            moveX(startPositionVisibleArea.getX(), -direction.getDeltaX()),
+            moveY(startPositionVisibleArea.getY(), -direction.getDeltaY())
+        );
+
+        // TODO Determine when exactly to update topline
     }
 
-    @Contract("_ -> !null")
-    private static ConstantPosition externalToInternalPosition(final ConstantPosition externalPosition) {
-        return new Position(externalPosition.getX() + 1, externalPosition.getY() + 1);
+    private static int moveX(final int start, final int distance) {
+        return doMove(start, distance, size.getWidth());
+    }
+
+    private static int moveY(final int start, final int distance) {
+        return doMove(start, distance, size.getHeight());
+    }
+
+    private static int doMove(final int start, final int distance, final int border) {
+        int result = start + distance;
+        if (result < 0) {
+            result += border;
+        }
+        else if (result >= border) {
+            result -= border;
+        }
+        return result;
     }
 
     private static void addDirection(final int index, final Field.ConstantDirection direction) {
@@ -647,69 +645,38 @@ public final class Field {
         }
     }
 
-    private static int doAddElement(final GameElement element, final ConstantPosition externalPosition) {
-        final ConstantPosition internalPosition = externalToInternalPosition(externalPosition);
-        final int index = calculateIndex(internalPosition);
-        if (cells[index] != null) {
-            removeElement(index);
-        }
-        addElement(index, element, Direction.STATIC);
-        return index;
-    }
-
     private static void resize(final ConstantSize size) {
-        arraySize.set(size.getWidth(), size.getHeight());
+        Field.size.set(size.getWidth(), size.getHeight());
         createCells();
-
-        switch (topLinePosition) {
-            case NONE:
-                topLineSize = arraySize.getWidth();
-                maxTopLine = arraySize.getHeight();
-                break;
-            case TOP:
-            case BOTTOM:
-                topLineSize = arraySize.getWidth();
-                maxTopLine = arraySize.getHeight();
-                break;
-            case LEFT:
-            case RIGHT:
-                topLineSize = arraySize.getHeight();
-                maxTopLine = arraySize.getWidth();
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
     }
 
     private static void createCells() {
-        cells = new GameElement[arraySize.getWidth() * arraySize.getHeight()];
+        cells = new GameElement[size.getWidth() * size.getHeight()];
         movingCells.clear();
     }
 
-    private static void setDirection(final ConstantDirection direction) {
-        if (direction == Direction.STATIC) {
-            topLinePosition = TopLinePosition.NONE;
-            renderCells = new RenderCellsTop();
+    private static void setDirection(final ConstantDirection constantDirection) {
+        direction = constantDirection;
+
+        ConstantDirection moveRelativeDirection;
+        int moveRelativeDistance;
+        if ((direction == Direction.STATIC) || (direction == Direction.DOWN) || (direction == Direction.UP)) {
+            addTopLineDirection = Direction.RIGHT;
+            moveRelativeDirection = Direction.UP;
+            moveRelativeDistance = (direction == Direction.UP) ? 2 : 1; // 2 to reach end of field
         }
-        else if (direction == Direction.DOWN) {
-            topLinePosition = TopLinePosition.TOP;
-            renderCells = new RenderCellsTop();
-        }
-        else if (direction == Direction.UP) {
-            topLinePosition = TopLinePosition.BOTTOM;
-            renderCells = new RenderCellsBottom();
-        }
-        else if (direction == Direction.RIGHT) {
-            topLinePosition = TopLinePosition.LEFT;
-            renderCells = new RenderCellsLeft();
-        }
-        else if (direction == Direction.LEFT) {
-            topLinePosition = TopLinePosition.RIGHT;
-            renderCells = new RenderCellsRight();
+        else if ((direction == Direction.LEFT) || (direction == Direction.RIGHT)) {
+            addTopLineDirection = Direction.DOWN;
+            moveRelativeDirection = Direction.LEFT;
+            moveRelativeDistance = (direction == Direction.LEFT) ? 2 : 1; // 2 to reach end of field
         }
         else {
             throw new UnsupportedOperationException();
         }
+        addTopLinePosition = new Position(
+            moveRelativeDirection.getDeltaX() * moveRelativeDistance,
+            moveRelativeDirection.getDeltaY() * moveRelativeDistance
+        );
     }
 
     private static class MovingCellContent {
@@ -722,13 +689,11 @@ public final class Field {
 
     private static GameElement[] cells;
     private static Map<Integer, MovingCellContent> movingCells = new TreeMap<>();
-    private static Size arraySize = new Size(0, 0);
-    private static RenderCells renderCells;
-    private static TopLinePosition topLinePosition;
-    private static int topLine;
-    private static int topLineSize;
-    private static int maxTopLine;
+    private static Size size = new Size(0, 0);
     private static ConstantDirection direction;
+    private static ConstantPosition startPositionVisibleArea;
+    private static ConstantDirection addTopLineDirection;
+    private static ConstantPosition addTopLinePosition;
     private static int frameCounter;
 
     // Hide constructor
