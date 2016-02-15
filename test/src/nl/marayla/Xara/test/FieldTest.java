@@ -4,6 +4,7 @@ import nl.marayla.Xara.Field;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 
 public class FieldTest extends BaseFieldTest {
     @Nullable
@@ -13,7 +14,7 @@ public class FieldTest extends BaseFieldTest {
         return null;
     }
 
-    public static Field.Direction determineDirectionForAllDirections(
+    public static Field.ConstantDirection determineDirectionForAllDirections(
         final Field.ConstantPosition position
     ) {
         final int middleFieldSize = FIELD_SIZE / 2;
@@ -99,11 +100,12 @@ public class FieldTest extends BaseFieldTest {
     }
 
     interface DetermineDirectionMethod {
-        Field.Direction execute(Field.ConstantPosition position);
+        Field.ConstantDirection execute(Field.ConstantPosition position);
     }
 
     static class DetermineDirectionMethodStatic implements DetermineDirectionMethod {
-        public Field.Direction execute(final Field.ConstantPosition position) {
+        @Override
+        public Field.ConstantDirection execute(final Field.ConstantPosition position) {
             return Field.Direction.STATIC;
         }
     }
@@ -113,23 +115,16 @@ public class FieldTest extends BaseFieldTest {
             this.fieldDirection = fieldDirection;
         }
 
-        public final Field.Direction execute(final Field.ConstantPosition position) {
-            if (fieldDirection.getDeltaY() != 0) {
-                return Field.Direction.UP;
-            }
-            else if (fieldDirection.getDeltaX() != 0) {
-                return Field.Direction.LEFT;
-            }
-            else {
-                return Field.Direction.DOWN;
-            }
+        @Override
+        public final Field.ConstantDirection execute(final Field.ConstantPosition position) {
+            return fieldDirection.reverse();
         }
 
         private Field.ConstantDirection fieldDirection;
     }
 
     static class DetermineDirectionMethodAllDirections implements DetermineDirectionMethod {
-        public final Field.Direction execute(final Field.ConstantPosition position) {
+        public final Field.ConstantDirection execute(final Field.ConstantPosition position) {
             return determineDirectionForAllDirections(position);
         }
     }
@@ -181,14 +176,13 @@ public class FieldTest extends BaseFieldTest {
     private void setupExpectedValuesDynamic(
         final Field.ConstantDirection fieldDirection,
         final DetermineDirectionMethod determineDirectionMethod,
-        final int numberOfRenderCalls,
-        final Field.ConstantPosition initialValue
+        final int numberOfRenderCalls
     ) {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), fieldDirection);
 
         Field.Position position = new Field.Position(Field.Position.ORIGIN);
-        for (int y = 0; y < 1/*FIELD_SIZE*/; y += 2) {
-            for (int x = 0; x < 1/*FIELD_SIZE*/; x += 2) {
+        for (int y = 0; y < FIELD_SIZE; y += 2) {
+            for (int x = 0; x < FIELD_SIZE; x += 2) {
                 position.set(x, y);
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
@@ -230,7 +224,7 @@ public class FieldTest extends BaseFieldTest {
                     Math.abs(initialValue.getX() - position.getX()),
                     Math.abs(initialValue.getY() - position.getY())
                 );
-                Field.Direction direction = determineDirectionForAllDirections(position);
+                Field.ConstantDirection direction = determineDirectionForAllDirections(position);
 
                 element.addExpectedRenderPosition(position);
                 for (int i = 1; i < numberOfRenderCalls; i++) {
@@ -261,14 +255,12 @@ public class FieldTest extends BaseFieldTest {
     }
 
     private void doTestDynamic(
-        final Field.ConstantDirection fieldDirection,
-        final Field.ConstantPosition initialValue
+        final Field.ConstantDirection fieldDirection
     ) {
         setupExpectedValuesDynamic(
             fieldDirection,
             new DetermineDirectionMethodDynamic(fieldDirection),
-            NUMBER_OF_RENDER_CALLS,
-            initialValue
+            NUMBER_OF_RENDER_CALLS
         );
         render(NUMBER_OF_RENDER_CALLS);
         verify();
@@ -290,6 +282,7 @@ public class FieldTest extends BaseFieldTest {
         verify();
     }
 
+    @Test
     public final void testTopLinePositionStatic() {
         doTestStatic(
             Field.Direction.DOWN,
@@ -297,6 +290,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testTopLinePositionDynamicNoMove() {
         doTestStatic(
             Field.Direction.DOWN,
@@ -304,6 +298,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testBottomLinePositionStatic() {
         doTestStatic(
             Field.Direction.UP,
@@ -311,6 +306,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testBottomLinePositionDynamicNoMove() {
         doTestStatic(
             Field.Direction.UP,
@@ -318,6 +314,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testLeftLinePositionStatic() {
         doTestStatic(
             Field.Direction.RIGHT,
@@ -325,6 +322,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testLeftLinePositionDynamicNoMove() {
         doTestStatic(
             Field.Direction.RIGHT,
@@ -332,6 +330,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testRightLinePositionStatic() {
         doTestStatic(
             Field.Direction.LEFT,
@@ -339,6 +338,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testRightLinePositionDynamicNoMove() {
         doTestStatic(
             Field.Direction.LEFT,
@@ -346,6 +346,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testNoneLinePositionStatic() {
         doTestStatic(
             Field.Direction.STATIC,
@@ -353,6 +354,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testNoneLinePositionDynamicNoMove() {
         doTestStatic(
             Field.Direction.STATIC,
@@ -360,22 +362,27 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testTopLinePositionDynamic() {
-        doTestDynamic(Field.Direction.DOWN, Field.Position.ORIGIN);
+        doTestDynamic(Field.Direction.DOWN);
     }
 
+    @Test
     public final void testBottomLinePositionDynamic() {
-        doTestDynamic(Field.Direction.UP, new Field.Position(0, FIELD_SIZE - 1));
+        doTestDynamic(Field.Direction.UP);
     }
 
+    @Test
     public final void testLeftLinePositionDynamic() {
-        doTestDynamic(Field.Direction.RIGHT, new Field.Position(0, FIELD_SIZE - 1));
+        doTestDynamic(Field.Direction.RIGHT);
     }
 
+    @Test
     public final void testRightLinePositionDynamic() {
-        doTestDynamic(Field.Direction.LEFT, new Field.Position(FIELD_SIZE - 1, FIELD_SIZE - 1));
+        doTestDynamic(Field.Direction.LEFT);
     }
 
+    @Test
     public final void testNoneLinePositionDynamic() {
         doTestStatic(
             Field.Direction.STATIC,
@@ -383,14 +390,17 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testNoneLinePositionAllDirections() {
         doTestAllDirections(Field.Direction.STATIC, Field.Position.ORIGIN, Field.Position.ORIGIN);
     }
 
+    @Test
     public final void testTopLinePositionAllDirections() {
         doTestAllDirections(Field.Direction.DOWN, Field.Position.ORIGIN, new Field.Position(0, 1));
     }
 
+    @Test
     public final void testBottomLinePositionAllDirections() {
         doTestAllDirections(
             Field.Direction.UP,
@@ -399,6 +409,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testLeftLinePositionAllDirections() {
         doTestAllDirections(
             Field.Direction.RIGHT,
@@ -407,6 +418,7 @@ public class FieldTest extends BaseFieldTest {
         );
     }
 
+    @Test
     public final void testRightLinePositionAllDirections() {
         doTestAllDirections(
             Field.Direction.LEFT,

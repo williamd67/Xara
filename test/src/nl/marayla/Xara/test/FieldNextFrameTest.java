@@ -3,31 +3,39 @@ package nl.marayla.Xara.test;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-public class FieldNextFrameTest extends TestCase {
-    @Override
-    protected final void setUp() {
+import static org.junit.Assert.assertEquals;
+
+public class FieldNextFrameTest {
+    @Before
+    public final void setUp() {
         levelGamePlay = new MockLevelGamePlay(null);
     }
 
+    @Test
     public final void testNoneBorderCleanup() {
         initializeField(Field.Direction.STATIC);
         doTestBorderCleanup(0, FIELD_SIZE - 1);
     }
 
+    @Test
     public final void testTopBorderCleanup() {
         doTestDynamicBorderCleanup(Field.Direction.DOWN);
     }
 
+    @Test
     public final void testBottomBorderCleanup() {
         doTestDynamicBorderCleanup(Field.Direction.UP);
     }
 
+    @Test
     public final void testLeftBorderCleanup() {
         doTestDynamicBorderCleanup(Field.Direction.RIGHT);
     }
 
+    @Test
     public final void testRightBorderCleanup() {
         doTestDynamicBorderCleanup(Field.Direction.LEFT);
     }

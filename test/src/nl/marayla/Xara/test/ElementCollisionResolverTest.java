@@ -11,10 +11,15 @@ import nl.marayla.Xara.ElementCollisions.Push;
 import nl.marayla.Xara.ElementCollisions.Neutral;
 import nl.marayla.Xara.GameElements.GameElement;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-public abstract class ElementCollisionResolverTest extends TestCase {
-    @Override
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class ElementCollisionResolverTest {
+    @Before
     public final void setUp() {
         int nrOfElements = LevelElements.values().length;
         collisionResolver = createCollisionResolver(nrOfElements);
@@ -56,15 +61,18 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         ] = elementCollision;
     }
 
+    @Test
     public final void testNoRegistration() {
         verify();
     }
 
+    @Test
     public final void testDefaultRegistration() {
         addDefaultCollision(determineCollision());
         verify();
     }
 
+    @Test
     public final void testMultipleDefaultRegistrations() {
         ElementCollision collision = determineCollision();
         for (int i = 0; i < REPEATS; i++) {
@@ -74,11 +82,13 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementRegistrationNoDefault() {
         addElementCollision(determineCollision(), determineElement());
         verify();
     }
 
+    @Test
     public final void testSingleElementRegistrationWithDefault() {
         ElementCollision collision = determineCollision();
         addDefaultCollision(collision);
@@ -87,6 +97,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementRegistrationWithDefaultWithReset() {
         ElementCollision collision1 = determineCollision();
         addDefaultCollision(collision1);
@@ -97,6 +108,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleEqualElementRegistrations() {
         ElementCollision collision = determineCollision();
         LevelElements element = determineElement();
@@ -107,6 +119,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleElementRegistrations() {
         ElementCollision collision = determineCollision();
         LevelElements element = determineElement();
@@ -118,11 +131,13 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationNoDefault() {
         addElementElementCollision(determineCollision(), determineElement(), determineElement());
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithDefault() {
         ElementCollision collision = determineCollision();
         addDefaultCollision(collision);
@@ -135,6 +150,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithDefaultWithReset() {
         ElementCollision collision1 = determineCollision();
         addDefaultCollision(collision1);
@@ -146,6 +162,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithElementNoDefault() {
         ElementCollision collision = determineCollision();
         LevelElements element1 = determineElement();
@@ -159,6 +176,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithElementNoDefaultWithReset() {
         ElementCollision collision1 = determineCollision();
         LevelElements element1 = determineElement();
@@ -178,6 +196,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithElementWithDefault() {
         ElementCollision collision = determineCollision();
         addDefaultCollision(collision);
@@ -194,6 +213,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithElementWithDefaultWithResetDefault() {
         ElementCollision collision1 = determineCollision();
         addDefaultCollision(collision1);
@@ -208,6 +228,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testSingleElementElementRegistrationWithElementWithDefaultWithResetElement() {
         ElementCollision collision = determineCollision();
         addDefaultCollision(collision);
@@ -222,6 +243,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleEqualElementElementRegistrations() {
         ElementCollision collision = determineCollision();
         LevelElements element1 = determineElement();
@@ -233,6 +255,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleEqualElementElementRegistrationsWithElement() {
         ElementCollision collision = determineCollision();
         LevelElements element1 = determineElement();
@@ -246,6 +269,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleElementElementRegistrations() {
         ElementCollision collision = determineCollision();
         LevelElements element1 = determineElement();
@@ -259,6 +283,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleElementElementRegistrationsWithElement() {
         ElementCollision collision = determineCollision();
         LevelElements element1 = determineElement();
@@ -276,6 +301,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testMultipleElementElementRegistrationsWithMultipleElements() {
         ElementCollision collision = determineCollision();
         addDefaultCollision(collision);
@@ -298,6 +324,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         verify();
     }
 
+    @Test
     public final void testDefaultAfterElementException() {
         try {
             collisionResolver.addElementCollision(determineCollision(), determineElement());
@@ -314,6 +341,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         }
     }
 
+    @Test
     public final void testDefaultAfterElementElementException() {
         try {
             collisionResolver.addElementElementCollision(
@@ -334,6 +362,7 @@ public abstract class ElementCollisionResolverTest extends TestCase {
         }
     }
 
+    @Test
     public final void testElementAfterElementElementException() {
         try {
             collisionResolver.addElementElementCollision(

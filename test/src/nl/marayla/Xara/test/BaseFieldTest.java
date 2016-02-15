@@ -3,16 +3,15 @@ package nl.marayla.Xara.test;
 import java.util.ArrayList;
 
 import nl.marayla.Xara.Field;
-import nl.marayla.Xara.Platform.XaraLog;
 import nl.marayla.Xara.Renderer.Rectangle;
 import nl.marayla.Xara.Renderer.RenderData;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 
-import junit.framework.TestCase;
+import org.junit.Before;
 
-public abstract class BaseFieldTest extends TestCase {
-    @Override
-    protected final void setUp() {
+public abstract class BaseFieldTest {
+    @Before
+    public final void setUp() {
         levelGamePlay = new MockLevelGamePlay(setupElementCollisionResolver());
         renderData = new RenderData(
             null, // Canvas is not used

@@ -547,19 +547,16 @@ public final class Field {
         return index;
     }
 
-    private static int doCalculateIndex(final int current, final int row, final int column) {
-        int result = current + row + column * size.getWidth();
-        while (result < 0) {
-            result += cells.length;
+    private static int doCalculateIndex(final int current, final int column, final int row) {
+        final int rowLength = size.getWidth();
+        if (current == 0) {
+            return column + row * rowLength;
         }
-        while (result >= cells.length) {
-            result -= cells.length;
-        }
-        return result;
+        return moveX(current % rowLength, column) + moveY(current / rowLength, row) * rowLength;
     }
 
-    private static int calculateIndex(final int row, final int column) {
-        return doCalculateIndex(0, row, column);
+    private static int calculateIndex(final int column, final int row) {
+        return doCalculateIndex(0, column, row);
     }
 
     private static int calculateIndex(final ConstantPosition position) {

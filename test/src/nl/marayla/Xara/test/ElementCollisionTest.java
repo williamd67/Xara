@@ -7,6 +7,8 @@ import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.Field.Direction;
 import nl.marayla.Xara.GameElements.GameElement;
 
+import org.junit.Test;
+
 public class ElementCollisionTest extends BaseCollisionFieldTest {
     private void addExpectedRenderPositionsStatic(
         final MockElementRenderer element,
@@ -202,6 +204,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         collisionResolver.addElementCollision(new MockFuse(), LevelElements.FUSE_DYNAMIC);
     }
 
+    @Test
     public final void testNoCollision() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -221,34 +224,42 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         verify();
     }
 
+    @Test
     public final void testEatCollision() {
         doTestCollision(LevelElements.EAT);
     }
 
+    @Test
     public final void testEatenCollision() {
         doTestCollision(LevelElements.EATEN);
     }
 
+    @Test
     public final void testBounceCollision() {
         doTestCollision(LevelElements.BOUNCE);
     }
 
+    @Test
     public final void testPushCollision() {
         doTestCollision(LevelElements.PUSH);
     }
 
+    @Test
     public final void testNeutralCollision() {
         doTestCollision(LevelElements.NEUTRAL);
     }
 
+    @Test
     public final void testFuseStaticCollision() {
         doTestCollision(LevelElements.FUSE_STATIC);
     }
 
+    @Test
     public final void testFuseDynamicCollision() {
         doTestCollision(LevelElements.FUSE_DYNAMIC);
     }
 
+    @Test
     public final void testPushCollisionIntoOther() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
         Field.ConstantDirection direction = Field.Direction.RIGHT;
@@ -349,6 +360,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *              LEFT_DOWN
      *      RIGHT   UP(INITIAL_POINT)
      */
+    @Test
     public final void testDynamicElementCircle() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -387,6 +399,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *              LEFT_DOWN
      *      RIGHT   STATIC(INITIAL_POINT)
      */
+    @Test
     public final void testDynamicDynamicStaticCollisionWhereSecondIsEaten() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -420,6 +433,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *              LEFT_DOWN
      *      RIGHT   STATIC(INITIAL_POINT)
      */
+    @Test
     public final void testDynamicDynamicStaticCollisionWhereSecondStopsMoving() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -457,6 +471,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *              LEFT_DOWN
      *      RIGHT   STATIC(INITIAL_POINT)
      */
+    @Test
     public final void testDynamicDynamicStaticCollisionWhereAllStopsMoving() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -498,6 +513,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
      *  but as UP moves up it should have no influence
      *      RIGHT   STATIC(INITIAL_POINT)   UP
      */
+    @Test
     public final void testStaticPushedIntoDynamic() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 
@@ -532,6 +548,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
     /**
      * doTestDynamicDynamicCollision
      */
+    @Test
     public final void testDynamicDynamicCollisionEat() {
         final int numberOfCallsAfterCollision = (
             NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
@@ -608,6 +625,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
     /**
      * doTestDynamicDynamicCollision
      */
+    @Test
     public final void testDynamicDynamicCollisionEaten() {
         final int numberOfCallsAfterCollision = (
             NUMBER_OF_RENDER_CALLS - NUMBER_OF_RENDER_CALLS_BEFORE_COLLISION
@@ -678,6 +696,7 @@ public class ElementCollisionTest extends BaseCollisionFieldTest {
         verify();
     }
 
+    @Test
     public final void testDynamicCircleWithCollision() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Direction.STATIC);
 

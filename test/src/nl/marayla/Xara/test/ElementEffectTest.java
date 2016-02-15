@@ -2,7 +2,10 @@ package nl.marayla.Xara.test;
 
 import nl.marayla.Xara.Field;
 
+import org.junit.Test;
+
 public class ElementEffectTest extends BaseCollisionFieldTest {
+    @Test
     public final void testNoCollision() {
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), Field.Direction.STATIC);
         MockElementRenderer element = new MockElementRenderer();
