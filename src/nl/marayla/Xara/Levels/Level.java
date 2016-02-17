@@ -46,12 +46,12 @@ public abstract class Level implements LevelGamePlay {
     }
 
     public final void initialize() {
-        Field.initialize(getSize(), getFieldDirection());
-        figure.initialize(getFigureMinArea(), getFigureMaxArea());
-
         time = initialTime();
 
         doInitialize();
+
+        figure.initialize(getFigureMinArea(), getFigureMaxArea());
+
         elementRenderers = createElementRenderers();
         elementCollisionResolver = createElementCollisionResolver();
     }
@@ -66,7 +66,6 @@ public abstract class Level implements LevelGamePlay {
 
     public abstract boolean failed();
     public abstract boolean succeeded();
-    public abstract Field.ConstantSize getSize(); // TODO Check visibility was protected
     public final int getTime() {
         return time;
     }
@@ -79,8 +78,7 @@ public abstract class Level implements LevelGamePlay {
         this.renderer = levelRendererCreator.create(figure);
     }
 
-    protected void doInitialize() {
-    }
+    protected abstract void doInitialize();
 
     protected ElementCollisionResolver doCreateElementCollisionResolver(
         final int numberOfElements
@@ -94,7 +92,6 @@ public abstract class Level implements LevelGamePlay {
     protected abstract void setupElementCollisionResolver(ElementCollisionResolver resolver);
     protected abstract GameElement[] getLevelElements();
 
-    protected abstract Field.ConstantDirection getFieldDirection();
     protected abstract Field.ConstantPosition getFigurePosition();
     protected abstract Field.ConstantPosition getFigureMinArea();
     protected abstract Field.ConstantPosition getFigureMaxArea();

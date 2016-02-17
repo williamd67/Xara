@@ -38,7 +38,7 @@ public class Renderer {
 
     private void renderMainArea(final Canvas canvas) {
         XaraLog.log.v(getClass().getName() + ".renderMainArea", "Render " + (renders++));
-        level.render(new RenderData(canvas, hotspot(H_MAINAREA), level.getSize()));
+        level.render(new RenderData(canvas, hotspot(H_MAINAREA)));
 
 /*
         String text = "";

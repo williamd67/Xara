@@ -5,13 +5,12 @@ import nl.marayla.Xara.Field;
 public class RenderData {
     public RenderData(
         final Canvas canvas,
-        final ConstantRectangle hotspotArea,
-        final Field.ConstantSize size
+        final ConstantRectangle hotspotArea
     ) {
         this.canvas = canvas;
         this.paint = new Paint(Paint.Flag.DITHER_FLAG);
         this.hotspotArea = hotspotArea;
-        this.cellSize = calculateCellSize(hotspotArea, size);
+        this.cellSize = calculateCellSize(hotspotArea, Field.getSize());
     }
 
     public final Canvas getCanvas() {

@@ -1,9 +1,5 @@
 package nl.marayla.Xara.LevelPlugins;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import nl.marayla.Xara.ElementCollisions.Bounce;
 import nl.marayla.Xara.ElementCollisions.Eaten;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
@@ -22,6 +18,7 @@ import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.Level;
 import org.jetbrains.annotations.Contract;
 
+import java.io.File;
 import javax.imageio.ImageIO;
 
 public class FileBasedLevel extends Level {
@@ -30,14 +27,7 @@ public class FileBasedLevel extends Level {
 
         assert fileName != null;
         assert !fileName.isEmpty();
-        try {
-            this.image = ImageIO.read(new File("res/level1.bmp"));
-            this.size = new Field.Size(image.getWidth(), image.getHeight());
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
-            throw new UnsupportedOperationException();
-        }
+        this.fileName = fileName;
     }
 
     @Contract(value = " -> false", pure = true)
@@ -95,9 +85,10 @@ public class FileBasedLevel extends Level {
     protected final void doInitialize() {
         try {
             Field.initializeFromImage(
-                image,
+                ImageIO.read(new File(fileName)),
                 FileBasedLevel::translateRGBToElement,
-                FileBasedLevel::translateRGBToDirection
+                FileBasedLevel::translateRGBToDirection,
+                Field.Direction.STATIC
             );
         }
         catch (Exception e) {
@@ -118,22 +109,10 @@ public class FileBasedLevel extends Level {
         return 100;
     }
 
-    @Contract(pure = true)
-    @Override
-    public final Field.ConstantSize getSize() {
-        return size;
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected final Field.ConstantDirection getFieldDirection() {
-        return Field.Direction.STATIC;
-    }
-
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
-        return new Field.Position(size.getWidth() / 2, size.getHeight() / 2);
+        return new Field.Position(Field.getSize().getWidth() / 2, Field.getSize().getHeight() / 2);
     }
 
     @Contract(" -> !null")
@@ -145,7 +124,7 @@ public class FileBasedLevel extends Level {
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
-        return new Field.Position(size.getWidth() - 1, size.getHeight() - 1);
+        return new Field.Position(Field.getSize().getWidth() - 1, Field.getSize().getHeight() - 1);
     }
 
     @Override
@@ -204,6 +183,5 @@ public class FileBasedLevel extends Level {
     }
 
     private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
-    private Field.ConstantSize size = new Field.Size(0, 0);
-    private BufferedImage image;
+    private String fileName;
 }

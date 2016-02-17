@@ -15,8 +15,7 @@ public abstract class BaseFieldTest {
         levelGamePlay = new MockLevelGamePlay(setupElementCollisionResolver());
         renderData = new RenderData(
             null, // Canvas is not used
-            new Rectangle(0, 0, FIELD_SIZE, FIELD_SIZE),
-            new Field.Size(FIELD_SIZE, FIELD_SIZE)
+            new Rectangle(0, 0, FIELD_SIZE, FIELD_SIZE)
         );
         elements = new ArrayList<>();
     }

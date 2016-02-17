@@ -40,12 +40,6 @@ public class SimpleLevel1 extends Level {
         return 250;
     }
 
-    @Contract(pure = true)
-    @Override
-    public final Field.ConstantSize getSize() {
-        return size;
-    }
-
     @Override
     public final ElementEffect determineElementEffect(
         final Field.PlacingAfterCollision placing,
@@ -81,35 +75,30 @@ public class SimpleLevel1 extends Level {
         return bonuses;
     }
 
-    @Contract(pure = true)
-    @Override
-    protected final Field.ConstantDirection getFieldDirection() {
-        return Field.Direction.DOWN;
-    }
-
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
-        return new Field.Position(size.getWidth() / 2, size.getHeight() - XARA_HEAD_Y);
+        return new Field.Position(SIZE.getWidth() / 2, SIZE.getHeight() - XARA_HEAD_Y);
     }
 
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMinArea() {
-        return new Field.Position(0, size.getHeight() - XARA_HEAD_Y);
+        return new Field.Position(0, SIZE.getHeight() - XARA_HEAD_Y);
     }
 
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
-        return new Field.Position(size.getWidth(), size.getHeight() - XARA_HEAD_Y);
+        return new Field.Position(SIZE.getWidth(), SIZE.getHeight() - XARA_HEAD_Y);
     }
 
     @Override
     protected final void doInitialize() {
+        Field.initialize(SIZE, DIRECTION);
         bonuses = 5;
 
-        SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, getFieldDirection().reverse());
+        SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, DIRECTION.reverse());
         figure.setFigureGameElement(figureGameElement);
         Field.addMovingElement(LevelElements.FIGURE, getFigurePosition(), figureGameElement.getDirection());
 
@@ -125,12 +114,12 @@ public class SimpleLevel1 extends Level {
     @Override
     protected final void doNextFrame() {
         frameEffect.execute();
-        int topLineSize = size.getWidth();
+        int topLineSize = SIZE.getWidth();
         if (
-            (getFieldDirection() == Field.Direction.LEFT)
-                || (getFieldDirection() == Field.Direction.RIGHT)
+            (DIRECTION == Field.Direction.LEFT)
+                || (DIRECTION == Field.Direction.RIGHT)
         ) {
-            topLineSize = size.getHeight();
+            topLineSize = SIZE.getHeight();
         }
         Field.addElementInjectionLine(LevelElements.BONUS, random.nextInt(topLineSize));
         Field.addElementInjectionLine(LevelElements.BLOCK, random.nextInt(topLineSize));
@@ -196,7 +185,9 @@ public class SimpleLevel1 extends Level {
 
     private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
 
-    private final Field.Size size = new Field.Size(20, 24);
+    private static Field.ConstantSize SIZE = new Field.Size(24, 20);
+    private static Field.ConstantDirection DIRECTION = Field.Direction.DOWN;
+
     private ElementEffect frameEffect;
     private int bonuses;
     private Random random = new Random(45);

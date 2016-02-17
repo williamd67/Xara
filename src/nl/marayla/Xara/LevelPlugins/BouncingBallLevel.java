@@ -39,17 +39,19 @@ public class BouncingBallLevel extends Level {
 
     @Override
     protected final void doInitialize() {
+        Field.initialize(SIZE, Field.Direction.STATIC);
+
         Field.Position point1 = new Field.Position(0, 0);
-        Field.Position point2 = new Field.Position(0, size.getHeight() - 1);
-        for (int x = 0; x < size.getWidth(); x++) {
+        Field.Position point2 = new Field.Position(0, SIZE.getHeight() - 1);
+        for (int x = 0; x < SIZE.getWidth(); x++) {
             Field.addStaticElement(LevelElements.WALL_VERTICAL, point1);
             Field.addStaticElement(LevelElements.WALL_VERTICAL, point2);
             point1.set(point1.getX() + 1, point1.getY());
             point2.set(point2.getX() + 1, point2.getY());
         }
         point1.set(0, 1);
-        point2.set(size.getWidth() - 1, 1);
-        for (int y = 1; y < (size.getHeight() - 1); y++) {
+        point2.set(SIZE.getWidth() - 1, 1);
+        for (int y = 1; y < (SIZE.getHeight() - 1); y++) {
             Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point1);
             Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point2);
             point1.set(point1.getX(), point1.getY() + 1);
@@ -58,10 +60,10 @@ public class BouncingBallLevel extends Level {
         // TODO remove
         Random random = new Random(47 + new Random().nextInt(100));
         for (int i = 0; i < 100; i++) {
-            point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
+            point1.set(random.nextInt(SIZE.getWidth() - 2) + 1, random.nextInt(SIZE.getHeight() - 2) + 1);
             Field.addStaticElement(LevelElements.BLOCK, point1);
         }
-        point1.set(random.nextInt(size.getWidth() - 2) + 1, random.nextInt(size.getHeight() - 2) + 1);
+        point1.set(random.nextInt(SIZE.getWidth() - 2) + 1, random.nextInt(SIZE.getHeight() - 2) + 1);
         Field.addMovingElement(LevelElements.BALL, point1, Field.Direction.LEFT_DOWN);
 
         SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, Field.Direction.STATIC);
@@ -78,22 +80,10 @@ public class BouncingBallLevel extends Level {
         return 100;
     }
 
-    @Contract(pure = true)
-    @Override
-    public final Field.ConstantSize getSize() {
-        return size;
-    }
-
-    @Contract(pure = true)
-    @Override
-    protected final Field.ConstantDirection getFieldDirection() {
-        return Field.Direction.STATIC;
-    }
-
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
-        return new Field.Position(size.getWidth() / 2, size.getHeight() / 2);
+        return new Field.Position(SIZE.getWidth() / 2, SIZE.getHeight() / 2);
     }
 
     @Contract(" -> !null")
@@ -105,7 +95,7 @@ public class BouncingBallLevel extends Level {
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
-        return new Field.Position(size.getWidth() - 1, size.getHeight() - 1);
+        return new Field.Position(SIZE.getWidth() - 1, SIZE.getHeight() - 1);
     }
 
     @Override
@@ -163,5 +153,5 @@ public class BouncingBallLevel extends Level {
     }
 
     private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
-    private final Field.ConstantSize size = new Field.Size(20, 24);
+    private static Field.ConstantSize SIZE = new Field.Size(24, 20);
 }

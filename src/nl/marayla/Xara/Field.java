@@ -486,6 +486,11 @@ public final class Field {
     }
 
     @Contract(pure = true)
+    public static ConstantSize getSize() {
+        return size;
+    }
+
+    @Contract(pure = true)
     protected static ConstantDirection getDirection(final int index) {
         final MovingCellContent content = movingCells.get(index);
         return content != null ? content.direction : Direction.STATIC;
@@ -575,9 +580,10 @@ public final class Field {
     public static void initializeFromImage(
         final BufferedImage image,
         final ColorToElement colorToElement,
-        final ColorToDirection colorToDirection
+        final ColorToDirection colorToDirection,
+        final ConstantDirection direction
     ) {
-        resize(new Size(image.getWidth(), image.getHeight()));
+        initialize(new Size(image.getWidth() - 2, image.getHeight() - 2), direction);
 
         final int[] colorArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         Field.Position point = new Field.Position(0, 0);
