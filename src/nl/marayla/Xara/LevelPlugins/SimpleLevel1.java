@@ -132,16 +132,16 @@ public class SimpleLevel1 extends Level {
         ) {
             topLineSize = size.getHeight();
         }
-        Field.addElementTopLine(LevelElements.BONUS, random.nextInt(topLineSize));
-        Field.addElementTopLine(LevelElements.BLOCK, random.nextInt(topLineSize));
+        Field.addElementInjectionLine(LevelElements.BONUS, random.nextInt(topLineSize));
+        Field.addElementInjectionLine(LevelElements.BLOCK, random.nextInt(topLineSize));
         if (random.nextInt(25) == 1) {
-            Field.addElementTopLine(LevelElements.WIDENER, random.nextInt(topLineSize));
+            Field.addElementInjectionLine(LevelElements.WIDENER, random.nextInt(topLineSize));
         }
         if (random.nextInt(25) == 1) {
-            Field.addElementTopLine(LevelElements.SUPERBONUS, random.nextInt(topLineSize));
+            Field.addElementInjectionLine(LevelElements.SUPERBONUS, random.nextInt(topLineSize));
         }
         if (random.nextInt(250) == 1) {
-            Field.addElementTopLine(LevelElements.EXTRALIFE, random.nextInt(topLineSize));
+            Field.addElementInjectionLine(LevelElements.EXTRALIFE, random.nextInt(topLineSize));
         }
     }
 

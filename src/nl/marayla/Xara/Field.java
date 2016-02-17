@@ -514,10 +514,10 @@ public final class Field {
         }
     }
 
-    public static void addElementTopLine(final GameElement element, final int visibleOffset) {
+    public static void addElementInjectionLine(final GameElement element, final int visibleOffset) {
         doAddElement(element, new Position(
-            addTopLineDirection.getDeltaX() * visibleOffset + addTopLinePosition.getX(),
-            addTopLineDirection.getDeltaY() * visibleOffset + addTopLinePosition.getY()
+            injectionLineDirection.getDeltaX() * visibleOffset + injectionLinePosition.getX(),
+            injectionLineDirection.getDeltaY() * visibleOffset + injectionLinePosition.getY()
         ));
     }
 
@@ -549,9 +549,6 @@ public final class Field {
 
     private static int doCalculateIndex(final int current, final int column, final int row) {
         final int rowLength = size.getWidth();
-        if (current == 0) {
-            return column + row * rowLength;
-        }
         return moveX(current % rowLength, column) + moveY(current / rowLength, row) * rowLength;
     }
 
@@ -605,6 +602,7 @@ public final class Field {
         frameCounter++;
         CollisionHandler.handleAllCollisions(levelGamePlay, movingCells.keySet());
         move();
+        cleanInjectionLine();
     }
 
     private static void move() {
@@ -612,8 +610,22 @@ public final class Field {
             moveX(startPositionVisibleArea.getX(), -direction.getDeltaX()),
             moveY(startPositionVisibleArea.getY(), -direction.getDeltaY())
         );
+    }
 
-        // TODO Determine when exactly to update topline
+    private static void cleanInjectionLine() {
+        final int increment = injectionLineDirection.getDeltaX() + injectionLineDirection.getDeltaY() * size.getWidth();
+
+        int index = calculateIndex(
+            moveX(startPositionVisibleArea.getX(), injectionLinePosition.getX()),
+            moveY(startPositionVisibleArea.getY(), injectionLinePosition.getY())
+        );
+        for (int i = 0; i < injectionLineLength; i++) {
+            removeElement(index);
+            index += increment;
+            if (index >= cells.length) {
+                index -= cells.length;
+            }
+        }
     }
 
     private static int moveX(final int start, final int distance) {
@@ -624,6 +636,7 @@ public final class Field {
         return doMove(start, distance, size.getHeight());
     }
 
+    @Contract(pure = true)
     private static int doMove(final int start, final int distance, final int border) {
         int result = start + distance;
         if (result < 0) {
@@ -645,6 +658,7 @@ public final class Field {
     private static void resize(final ConstantSize size) {
         Field.size.set(size.getWidth(), size.getHeight());
         createCells();
+        setInjectionLineLength();
     }
 
     private static void createCells() {
@@ -658,22 +672,35 @@ public final class Field {
         ConstantDirection moveRelativeDirection;
         int moveRelativeDistance;
         if ((direction == Direction.STATIC) || (direction == Direction.DOWN) || (direction == Direction.UP)) {
-            addTopLineDirection = Direction.RIGHT;
+            injectionLineDirection = Direction.RIGHT;
             moveRelativeDirection = Direction.UP;
             moveRelativeDistance = (direction == Direction.UP) ? 2 : 1; // 2 to reach end of field
         }
         else if ((direction == Direction.LEFT) || (direction == Direction.RIGHT)) {
-            addTopLineDirection = Direction.DOWN;
+            injectionLineDirection = Direction.DOWN;
             moveRelativeDirection = Direction.LEFT;
             moveRelativeDistance = (direction == Direction.LEFT) ? 2 : 1; // 2 to reach end of field
         }
         else {
             throw new UnsupportedOperationException();
         }
-        addTopLinePosition = new Position(
+        injectionLinePosition = new Position(
             moveRelativeDirection.getDeltaX() * moveRelativeDistance,
             moveRelativeDirection.getDeltaY() * moveRelativeDistance
         );
+        setInjectionLineLength();
+    }
+
+    private static void setInjectionLineLength() {
+        if ((direction == Direction.STATIC) || (direction == Direction.DOWN) || (direction == Direction.UP)) {
+            injectionLineLength = (direction == Direction.STATIC) ? 0 : (size.getWidth() - 2); // only visible part
+        }
+        else if ((direction == Direction.LEFT) || (direction == Direction.RIGHT)) {
+            injectionLineLength = (size.getHeight() - 2); // only visible part
+        }
+        else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private static class MovingCellContent {
@@ -689,8 +716,9 @@ public final class Field {
     private static Size size = new Size(0, 0);
     private static ConstantDirection direction;
     private static ConstantPosition startPositionVisibleArea;
-    private static ConstantDirection addTopLineDirection;
-    private static ConstantPosition addTopLinePosition;
+    private static ConstantDirection injectionLineDirection;
+    private static ConstantPosition injectionLinePosition;
+    private static int injectionLineLength;
     private static int frameCounter;
 
     // Hide constructor

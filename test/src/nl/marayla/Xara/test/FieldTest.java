@@ -1,17 +1,22 @@
 package nl.marayla.Xara.test;
 
+import nl.marayla.Xara.ElementCollisions.Eat;
+import nl.marayla.Xara.ElementCollisions.StandardElementCollisionResolver;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
+import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 public class FieldTest extends BaseFieldTest {
-    @Nullable
-    @Contract(value = " -> null", pure = true)
     @Override
     protected final ElementCollisionResolver setupElementCollisionResolver() {
-        return null;
+        ElementCollisionResolver collisionResolver = new StandardElementCollisionResolver(
+            LevelElements.values().length
+        );
+        collisionResolver.addElementCollision(Eat.INSTANCE, LevelElements.EAT);
+        return collisionResolver;
     }
 
     public static Field.ConstantDirection determineDirectionForAllDirections(
@@ -131,7 +136,6 @@ public class FieldTest extends BaseFieldTest {
 
     private void setupExpectedValuesStatic(
         final Field.ConstantDirection fieldDirection,
-        final DetermineDirectionMethod determineDirectionMethod,
         final int numberOfRenderCalls
     ) {
         final int FULL_SIZE = FIELD_SIZE + 2;
@@ -144,17 +148,15 @@ public class FieldTest extends BaseFieldTest {
                 position.set(x, y);
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
-                Field.addMovingElement(
-                    element,
-                    position,
-                    determineDirectionMethod.execute(position)
-                );
+                Field.addStaticElement(element, position);
 
                 for (int i = 0; i < numberOfRenderCalls; i++) {
-                    if ((position.getX() < FIELD_SIZE) && (position.getY() < FIELD_SIZE)) {
-                        // Do not expected render-position if outside visible field (in borders)
-                        element.addExpectedRenderPosition(position);
+                    if ((position.getX() >= FIELD_SIZE) || (position.getY() >= FIELD_SIZE)) {
+                        // Do not add expected render-positions if outside visible field
+                        break;
                     }
+
+                    element.addExpectedRenderPosition(position);
                     position.add(fieldDirection);
                     if (position.getX() < 0) {
                         position.set(position.getX() + FULL_SIZE, position.getY());
@@ -202,54 +204,64 @@ public class FieldTest extends BaseFieldTest {
     private void setupExpectedValuesAllDirections(
         final Field.ConstantDirection fieldDirection,
         final DetermineDirectionMethod determineDirectionMethod,
-        final int numberOfRenderCalls,
-        final Field.ConstantPosition initialValue,
-        final Field.ConstantPosition addition
+        final int numberOfRenderCalls
     ) {
+        final int FULL_SIZE = FIELD_SIZE + 2;
+
         Field.initialize(new Field.Size(FIELD_SIZE, FIELD_SIZE), fieldDirection);
+        // Four corners
+        Field.addMovingElement(LevelElements.EAT, new Field.Position(-1, -1), fieldDirection.reverse());
+        Field.addMovingElement(LevelElements.EAT, new Field.Position(-1, FIELD_SIZE), fieldDirection.reverse());
+        Field.addMovingElement(LevelElements.EAT, new Field.Position(FIELD_SIZE, -1), fieldDirection.reverse());
+        Field.addMovingElement(LevelElements.EAT, new Field.Position(FIELD_SIZE, FIELD_SIZE), fieldDirection.reverse());
+
+        // Four sides
+        for (int column = -1; column <= FIELD_SIZE; column++) {
+            Field.addMovingElement(LevelElements.EAT, new Field.Position(column, -1), fieldDirection.reverse());
+            Field.addMovingElement(LevelElements.EAT, new Field.Position(column, FIELD_SIZE), fieldDirection.reverse());
+        }
+        for (int row = -1; row <= FIELD_SIZE; row++) {
+            Field.addMovingElement(LevelElements.EAT, new Field.Position(-1, row), fieldDirection.reverse());
+            Field.addMovingElement(LevelElements.EAT, new Field.Position(FIELD_SIZE, row), fieldDirection.reverse());
+        }
 
         Field.Position position = new Field.Position(Field.Position.ORIGIN);
         for (int y = 0; y < FIELD_SIZE; y += 2) {
             for (int x = 0; x < FIELD_SIZE; x += 2) {
                 position.set(x, y);
+                final Field.ConstantDirection direction = determineDirectionMethod.execute(position);
+
                 MockElementRenderer element = new MockElementRenderer();
                 addElement(element);
-                Field.addMovingElement(
-                    element,
-                    position,
-                    determineDirectionMethod.execute(position)
-                );
+                Field.addMovingElement(element, position, direction);
 
-                position.set(
-                    Math.abs(initialValue.getX() - position.getX()),
-                    Math.abs(initialValue.getY() - position.getY())
-                );
-                Field.ConstantDirection direction = determineDirectionForAllDirections(position);
-
-                element.addExpectedRenderPosition(position);
-                for (int i = 1; i < numberOfRenderCalls; i++) {
-                    position.set(
-                        position.getX() + direction.getDeltaX() + addition.getX(),
-                        position.getY() + direction.getDeltaY() + addition.getY()
-                    );
-                    if (
-                        (position.getX() >= 0)
-                            && (position.getX() < FIELD_SIZE)
-                            && (position.getY() >= 0)
-                            && (position.getY() < FIELD_SIZE)
-                        ) {
-                        element.addExpectedRenderPosition(position);
+                for (int i = 0; i < numberOfRenderCalls; i++) {
+                    if ((position.getX() >= FIELD_SIZE) || (position.getY() >= FIELD_SIZE)) {
+                        // Do not add expected render-position if outside visible field (in borders)
+                        break;
+                    }
+                    element.addExpectedRenderPosition(position);
+                    position.add(fieldDirection);
+                    position.add(direction);
+                    if (position.getX() < 0) {
+                        position.set(position.getX() + FULL_SIZE, position.getY());
+                    }
+                    if (position.getY() < 0) {
+                        position.set(position.getX(), position.getY() + FULL_SIZE);
+                    }
+                    if (position.getX() >= FULL_SIZE) {
+                        position.set(position.getX() - FULL_SIZE, position.getY());
+                    }
+                    if (position.getY() >= FULL_SIZE) {
+                        position.set(position.getX(), position.getY() - FULL_SIZE);
                     }
                 }
             }
         }
     }
 
-    private void doTestStatic(
-        final Field.ConstantDirection fieldDirection,
-        final DetermineDirectionMethod determineDirectionMethod
-    ) {
-        setupExpectedValuesStatic(fieldDirection, determineDirectionMethod, NUMBER_OF_RENDER_CALLS);
+    private void doTestStatic(final Field.ConstantDirection fieldDirection) {
+        setupExpectedValuesStatic(fieldDirection, NUMBER_OF_RENDER_CALLS);
         render(NUMBER_OF_RENDER_CALLS);
         verify();
     }
@@ -267,163 +279,95 @@ public class FieldTest extends BaseFieldTest {
     }
 
     private void doTestAllDirections(
-        final Field.ConstantDirection fieldDirection,
-        final Field.ConstantPosition initialValue,
-        final Field.ConstantPosition addition
+        final Field.ConstantDirection fieldDirection
     ) {
         setupExpectedValuesAllDirections(
             fieldDirection,
             new DetermineDirectionMethodAllDirections(),
-            NUMBER_OF_RENDER_CALLS,
-            initialValue,
-            addition
+            NUMBER_OF_RENDER_CALLS
         );
         render(NUMBER_OF_RENDER_CALLS);
         verify();
     }
 
     @Test
-    public final void testTopLinePositionStatic() {
-        doTestStatic(
-            Field.Direction.DOWN,
-            new DetermineDirectionMethodStatic()
-        );
+    public final void testFieldDirectionDownNoMove() {
+        doTestStatic(Field.Direction.DOWN);
     }
 
     @Test
-    public final void testTopLinePositionDynamicNoMove() {
-        doTestStatic(
-            Field.Direction.DOWN,
-            new DetermineDirectionMethodStatic()
-        );
+    public final void testFieldDirectionUpNoMove() {
+        doTestStatic(Field.Direction.UP);
     }
 
     @Test
-    public final void testBottomLinePositionStatic() {
-        doTestStatic(
-            Field.Direction.UP,
-            new DetermineDirectionMethodStatic()
-        );
+    public final void testFieldDirectionRightNoMove() {
+        doTestStatic(Field.Direction.RIGHT);
     }
 
     @Test
-    public final void testBottomLinePositionDynamicNoMove() {
-        doTestStatic(
-            Field.Direction.UP,
-            new DetermineDirectionMethodStatic()
-        );
+    public final void testFieldDirectionLeftNoMove() {
+        doTestStatic(Field.Direction.LEFT);
     }
 
     @Test
-    public final void testLeftLinePositionStatic() {
-        doTestStatic(
-            Field.Direction.RIGHT,
-            new DetermineDirectionMethodStatic()
-        );
+    public final void testFieldDirectionStaticNoMove() {
+        doTestStatic(Field.Direction.STATIC);
     }
 
     @Test
-    public final void testLeftLinePositionDynamicNoMove() {
-        doTestStatic(
-            Field.Direction.RIGHT,
-            new DetermineDirectionMethodStatic()
-        );
-    }
-
-    @Test
-    public final void testRightLinePositionStatic() {
-        doTestStatic(
-            Field.Direction.LEFT,
-            new DetermineDirectionMethodStatic()
-        );
-    }
-
-    @Test
-    public final void testRightLinePositionDynamicNoMove() {
-        doTestStatic(
-            Field.Direction.LEFT,
-            new DetermineDirectionMethodStatic()
-        );
-    }
-
-    @Test
-    public final void testNoneLinePositionStatic() {
-        doTestStatic(
-            Field.Direction.STATIC,
-            new DetermineDirectionMethodStatic()
-        );
-    }
-
-    @Test
-    public final void testNoneLinePositionDynamicNoMove() {
-        doTestStatic(
-            Field.Direction.STATIC,
-            new DetermineDirectionMethodStatic()
-        );
-    }
-
-    @Test
-    public final void testTopLinePositionDynamic() {
+    public final void testFieldDirectionDownMove() {
         doTestDynamic(Field.Direction.DOWN);
     }
 
     @Test
-    public final void testBottomLinePositionDynamic() {
+    public final void testFieldDirectionUpMove() {
         doTestDynamic(Field.Direction.UP);
     }
 
     @Test
-    public final void testLeftLinePositionDynamic() {
+    public final void testFieldDirectionRightMove() {
         doTestDynamic(Field.Direction.RIGHT);
     }
 
     @Test
-    public final void testRightLinePositionDynamic() {
+    public final void testFieldDirectionLeftMove() {
         doTestDynamic(Field.Direction.LEFT);
     }
 
     @Test
-    public final void testNoneLinePositionDynamic() {
-        doTestStatic(
-            Field.Direction.STATIC,
-            new DetermineDirectionMethodDynamic(Field.Direction.STATIC)
-        );
+    public final void testFieldDirectionStaticMove() {
+        doTestStatic(Field.Direction.STATIC);
     }
 
     @Test
-    public final void testNoneLinePositionAllDirections() {
-        doTestAllDirections(Field.Direction.STATIC, Field.Position.ORIGIN, Field.Position.ORIGIN);
+    public final void testFieldDirectionStaticMoveAllDirections() {
+        doTestAllDirections(Field.Direction.STATIC);
     }
 
     @Test
-    public final void testTopLinePositionAllDirections() {
-        doTestAllDirections(Field.Direction.DOWN, Field.Position.ORIGIN, new Field.Position(0, 1));
+    public final void testFieldDirectionDownMoveAllDirections() {
+        doTestAllDirections(Field.Direction.DOWN);
     }
 
     @Test
-    public final void testBottomLinePositionAllDirections() {
-        doTestAllDirections(
-            Field.Direction.UP,
-            new Field.Position(0, FIELD_SIZE - 1),
-            new Field.Position(0, -1)
-        );
+    public final void testFieldDirectionUpMoveAllDirections() {
+        doTestAllDirections(Field.Direction.UP);
     }
 
     @Test
-    public final void testLeftLinePositionAllDirections() {
-        doTestAllDirections(
-            Field.Direction.RIGHT,
-            new Field.Position(0, FIELD_SIZE - 1),
-            new Field.Position(1, 0)
-        );
+    public final void testFieldDirectionRightMoveAllDirections() {
+        doTestAllDirections(Field.Direction.RIGHT);
     }
 
     @Test
-    public final void testRightLinePositionAllDirections() {
-        doTestAllDirections(
-            Field.Direction.LEFT,
-            new Field.Position(FIELD_SIZE - 1, FIELD_SIZE - 1),
-            new Field.Position(-1, 0)
-        );
+    public final void testFieldDirectionLeftMoveAllDirections() {
+        doTestAllDirections(Field.Direction.LEFT);
     }
+
+    protected enum LevelElements implements GameElement {
+        STATIC,
+        EAT
+    }
+
 }

@@ -7,14 +7,12 @@ Aim is that creating a level with specific game-play is as simple as possible.
 
 It is clearly a project in progress so there is a lot todo:
 
- *  Introduce reading of bitmap to create level
+ *  Introduce ElementCollision Hide
  *  Make resulting fusion-direction part of fusion
  *  Introduce Field.RelativePosition as derived from ConstantDirection
  *  Introduce move Field in multiple directions at once (use Direction)
  *  Bounce one frame delay (move element as well in frame it bounces)
- *  Rename Field.TopLinePosition with a clearer name
- *  Test all Field.TopLinePosition's with FigureGameElement
- *  Remove render-method from Field
+ *  Test all Field.injectionLinePosition's with FigureGameElement
  *  Reconnect Widener again and solve issues
  *  Introduce two (figure)GameElements connected to each other moving together (like a snake)
  *  Introduce speed (currently everything moves with the same speed)
