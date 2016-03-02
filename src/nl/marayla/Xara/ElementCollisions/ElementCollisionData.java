@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public class ElementCollisionData {
     public final static class List extends ArrayList<ElementCollisionData> {
@@ -29,11 +30,11 @@ public class ElementCollisionData {
     public static ElementCollisionData createInstance(
         final int index,
         final GameElement element,
-        final Field.ConstantDirection direction,
+        final Field.ConstantMovingCell movingCell,
         final boolean isColliding
     )
     {
-        return getInstance().set(index, element, direction, null, isColliding);
+        return getInstance().set(index, element, movingCell, null, isColliding);
     }
 
     public static ElementCollisionData createInstance(final ElementCollisionData other) {
@@ -58,7 +59,11 @@ public class ElementCollisionData {
     }
 
     public final Field.ConstantDirection getDirection() {
-        return direction;
+        return movingCell != null ? movingCell.getDirection() : Field.Direction.STATIC;
+    }
+
+    public final int[] getConnections() {
+        return movingCell != null ? movingCell.getConnections() : NO_CONNECTIONS;
     }
 
     public final ElementCollision getCollision() {
@@ -74,7 +79,7 @@ public class ElementCollisionData {
     }
 
     public final int calculateNextIndex() {
-        return Field.calculateIndex(index, direction);
+        return Field.calculateIndex(index, getDirection());
     }
 
     private static ElementCollisionData getInstance() {
@@ -89,41 +94,47 @@ public class ElementCollisionData {
         return set(
                 other.getIndex(),
                 other.getElement(),
-                other.getDirection(),
+            other.getMovingCell(),
                 other.getCollision(),
             other.isColliding()
         );
     }
 
     private ElementCollisionData reset() {
-        return set(0, null, Field.Direction.STATIC, null, false);
+        return set(0, null, null, null, false);
     }
 
     private ElementCollisionData set(
         final int index,
         final GameElement element,
-        final Field.ConstantDirection direction,
+        final Field.ConstantMovingCell movingCell,
         final ElementCollision collision,
         final boolean isColliding
     ) {
         this.index = index;
         this.element = element;
-        this.direction = direction;
+        this.movingCell = movingCell;
         this.collision = collision;
         this.isColliding = isColliding;
 
         return this;
     }
 
+    private Field.ConstantMovingCell getMovingCell() {
+        return movingCell;
+    }
+
     private int index;
     private GameElement element;
-    private Field.ConstantDirection direction;
+    private Field.ConstantMovingCell movingCell;
     private ElementCollision collision;
     private boolean isColliding;
 
     private ElementCollisionData() {
         reset();
     }
+
+    private static final int[] NO_CONNECTIONS = {};
 
     private static final int INITIAL_POOL_SIZE = 10;
     private static int poolFree = INITIAL_POOL_SIZE;

@@ -490,10 +490,8 @@ public final class Field {
         return size;
     }
 
-    @Contract(pure = true)
-    protected static ConstantDirection getDirection(final int index) {
-        final MovingCellContent content = movingCells.get(index);
-        return content != null ? content.direction : Direction.STATIC;
+    protected static ConstantMovingCell getMovingCell(final int index) {
+        return movingCells.get(index);
     }
 
     protected static void addElement(
@@ -657,7 +655,7 @@ public final class Field {
     private static void addDirection(final int index, final Field.ConstantDirection direction) {
         assert (!movingCells.containsKey(index));
         if (direction != Direction.STATIC) {
-            movingCells.put(index, new MovingCellContent(direction));
+            movingCells.put(index, new NotConnectedMovingCell(direction));
         }
     }
 
@@ -709,16 +707,54 @@ public final class Field {
         }
     }
 
-    private static class MovingCellContent {
-        public MovingCellContent(final ConstantDirection direction) {
+    public interface ConstantMovingCell {
+        Field.ConstantDirection getDirection();
+
+        int[] getConnections();
+    }
+
+    private static abstract class MovingCell implements ConstantMovingCell {
+        public MovingCell(final ConstantDirection direction) {
             this.direction = direction;
         }
 
-        public Field.ConstantDirection direction;
+        @Override
+        public Field.ConstantDirection getDirection() {
+            return direction;
+        }
+
+        private Field.ConstantDirection direction;
+    }
+
+    private static class NotConnectedMovingCell extends MovingCell {
+        public NotConnectedMovingCell(final ConstantDirection direction) {
+            super(direction);
+        }
+
+        @Override
+        public int[] getConnections() {
+            return null;
+        }
+    }
+
+    private static class ConnectedMovingCell extends MovingCell {
+        public ConnectedMovingCell(final ConstantDirection direction, final int[] connections) {
+            super(direction);
+
+            assert connections.length != 0;
+            this.connections = connections;
+        }
+
+        @Override
+        public final int[] getConnections() {
+            return connections;
+        }
+
+        private int[] connections;
     }
 
     private static GameElement[] cells;
-    private static Map<Integer, MovingCellContent> movingCells = new TreeMap<>();
+    private static Map<Integer, ConstantMovingCell> movingCells = new TreeMap<>();
     private static Size size = new Size(0, 0);
     private static ConstantDirection direction;
     private static ConstantPosition startPositionVisibleArea;
@@ -741,7 +777,7 @@ class CollisionHandler {
         while (!collisions.isEmpty()) {
             int cellIndex = collisions.removeFirst();
             assert (Field.getElement(cellIndex) != null);
-            assert (Field.getDirection(cellIndex) != Field.Direction.STATIC);
+            assert (Field.getMovingCell(cellIndex).getDirection() != Field.Direction.STATIC);
             handleSingleCollision(collisions, cellIndex, levelGamePlay);
         }
     }
@@ -983,25 +1019,25 @@ class CollisionHandler {
     }
 
     private static ElementCollisionData createMainElementCollisionData(final int cellIndex) {
-        assert (Field.getDirection(cellIndex) != Field.Direction.STATIC);
+        assert (Field.getMovingCell(cellIndex).getDirection() != Field.Direction.STATIC);
         assert (Field.getElement(cellIndex) != null);
 
         return ElementCollisionData.createInstance(
             cellIndex,
             Field.getElement(cellIndex),
-            Field.getDirection(cellIndex),
+            Field.getMovingCell(cellIndex),
             true
         );
     }
 
     private static ElementCollisionData createOtherElementCollisionData(final ElementCollisionData elementCollisionData) {
         final int nextCellIndex = elementCollisionData.calculateNextIndex();
-        final Field.ConstantDirection staticDirection = Field.getDirection(nextCellIndex);
+        final Field.ConstantMovingCell movingCell = Field.getMovingCell(nextCellIndex);
         return ElementCollisionData.createInstance(
             nextCellIndex,
             Field.getElement(nextCellIndex),
-            staticDirection,
-            (staticDirection.reverse() == elementCollisionData.getDirection())
+            movingCell,
+            (movingCell != null) && (movingCell.getDirection().reverse() == elementCollisionData.getDirection())
         );
     }
 }
