@@ -18,7 +18,7 @@ public class Renderer {
     }
 
     public final void sizeChanged(final int width, final int height) {
-        mainArea.set(0, 0, width, (height * 9) / 10);
+        mainArea.set(0, 0, width, (height * 9.) / 10);
         infoArea.set(0, mainArea.getBottom() + 1, width, height);
         inputArea.set(0, infoArea.getTop(), infoArea.height(), infoArea.getBottom());
     }

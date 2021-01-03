@@ -182,6 +182,6 @@ public class FileBasedLevel extends Level {
         BLOCK
     }
 
-    private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
-    private String fileName;
+    private static final LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
+    private final String fileName;
 }

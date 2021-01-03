@@ -62,7 +62,7 @@ public class XaraFX extends Application {
         launch(args);
     }
 
-    class MyCanvas extends javafx.scene.canvas.Canvas implements nl.marayla.Xara.Renderer.Canvas {
+    static class MyCanvas extends javafx.scene.canvas.Canvas implements nl.marayla.Xara.Renderer.Canvas {
         public MyCanvas(double width, double height) {
             super(width, height);
         }
@@ -90,7 +90,7 @@ public class XaraFX extends Application {
             GraphicsContext gc = this.getGraphicsContext2D();
             if(paint.getStyle() == Paint.Style.FILL) {
                 gc.setFill(transformColorToFXColor(paint.getColor()));
-                gc.fillRect(rectangle.getLeft(), rectangle.getTop(), rectangle.getRight(), rectangle.getBottom());
+                gc.fillRect(rectangle.getLeft(), rectangle.getTop(), rectangle.width(), rectangle.height());
             }
         }
 
@@ -135,8 +135,8 @@ public class XaraFX extends Application {
         canvas.widthProperty().bind(scene.widthProperty());
         canvas.heightProperty().bind(scene.heightProperty());
 
-        canvas.widthProperty().addListener( (observable) -> { canvas.onSizeChanged(); } );
-        canvas.heightProperty().addListener( (observable) -> { canvas.onSizeChanged(); } );
+        canvas.widthProperty().addListener((observable) -> canvas.onSizeChanged());
+        canvas.heightProperty().addListener((observable) -> canvas.onSizeChanged());
 
         primaryStage.setTitle("Xara");
         primaryStage.setScene(scene);

@@ -51,11 +51,11 @@ public class RenderData {
         return new Rectangle();
     }
 
-    private Canvas canvas; // reference
-    private Paint paint = null;
-    private ConstantRectangle hotspotArea; // reference
-    private Rectangle elementArea = new Rectangle();
-    private ConstantRectangle cellSize;
+    private final Canvas canvas; // reference
+    private final Paint paint;
+    private final ConstantRectangle hotspotArea; // reference
+    private final Rectangle elementArea = new Rectangle();
+    private final ConstantRectangle cellSize;
 
-    private static final int PRECISION = 2^10;
+    private static final int PRECISION = 2 ^ 10;
 }

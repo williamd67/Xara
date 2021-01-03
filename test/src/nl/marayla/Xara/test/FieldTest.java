@@ -5,8 +5,6 @@ import nl.marayla.Xara.ElementCollisions.StandardElementCollisionResolver;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.GameElements.GameElement;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 public class FieldTest extends BaseFieldTest {
@@ -25,7 +23,7 @@ public class FieldTest extends BaseFieldTest {
         final int middleFieldSize = FIELD_SIZE / 2;
         final int positionX = position.getX();
         final int positionY = position.getY();
-        /**
+        /*
          * End-goal of directions is:
          *  -1,-1    0,-1    0,-1   0,-1    0,-1    0,-1    1,-1
          *  -1, 0   -1,-1    0,-1   0,-1    0,-1    1,-1    1, 0
@@ -125,7 +123,7 @@ public class FieldTest extends BaseFieldTest {
             return fieldDirection.reverse();
         }
 
-        private Field.ConstantDirection fieldDirection;
+        private final Field.ConstantDirection fieldDirection;
     }
 
     static class DetermineDirectionMethodAllDirections implements DetermineDirectionMethod {

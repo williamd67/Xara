@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class FieldNextFrameTest {
     @Before
@@ -64,11 +65,7 @@ public class FieldNextFrameTest {
         }
         for (int y = 1; y < FIELD_SIZE; y++) {
             for (int x = 1; x < FIELD_SIZE; x++) {
-                assertEquals(
-                    "cell [" + (x + (y * FULL_SIZE)) + "] is empty",
-                    null,
-                    Field.getElement(x + y * FULL_SIZE)
-                );
+                assertNull("cell [" + (x + (y * FULL_SIZE)) + "] is empty", Field.getElement(x + y * FULL_SIZE));
             }
         }
     }
@@ -116,9 +113,8 @@ public class FieldNextFrameTest {
         Field.nextFrame(levelGamePlay);
         final int FULL_SIZE = FIELD_SIZE + 2;
         for (int cellIndex = 0; cellIndex < (FULL_SIZE * FULL_SIZE); cellIndex++) {
-            assertEquals(
+            assertNull(
                 "cell [" + cellIndex % FULL_SIZE + ", " + cellIndex / FULL_SIZE + "] is not empty",
-                null,
                 Field.getElement(cellIndex)
             );
         }

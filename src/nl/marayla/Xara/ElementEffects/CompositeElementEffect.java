@@ -12,5 +12,5 @@ public class CompositeElementEffect implements ElementEffect {
             effect.execute();
         }
     }
-    private ArrayList<ElementEffect> effects = new ArrayList<>();
+    private final ArrayList<ElementEffect> effects = new ArrayList<>();
 }

@@ -1,12 +1,9 @@
 package nl.marayla.Xara;
 
 import nl.marayla.Xara.InputHandler.InputHandler;
-import nl.marayla.Xara.LevelPlugins.BouncingBallLevel;
-import nl.marayla.Xara.LevelPlugins.FileBasedLevel;
-import nl.marayla.Xara.LevelPlugins.TestLevel;
+import nl.marayla.Xara.LevelPlugins.*;
 import nl.marayla.Xara.Levels.Level;
 
-import nl.marayla.Xara.LevelPlugins.SimpleLevel1;
 import org.jetbrains.annotations.Contract;
 
 final class LevelManager {
@@ -27,8 +24,9 @@ final class LevelManager {
         Level active;
         switch (difficulty) {
             case 0:
+                active = new BrickLevel(figure);
 //                active = new SimpleLevel1(figure);
-                active = new BouncingBallLevel(figure);
+//                active = new BouncingBallLevel(figure);
 //                active = new FileBasedLevel(figure, "level1.bmp");
 //                active = new TestLevel(figure);
                 break;
@@ -42,6 +40,7 @@ final class LevelManager {
         difficulty++;
         return active;
     }
+
     private int difficulty;
-    private Figure figure;
+    private final Figure figure;
 }

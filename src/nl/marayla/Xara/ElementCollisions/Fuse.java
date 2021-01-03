@@ -2,7 +2,6 @@ package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
-import org.jetbrains.annotations.Contract;
 
 public abstract class Fuse extends StandardElementCollision {
     protected abstract GameElement createFusionElement(final GameElement element1, final GameElement element2);

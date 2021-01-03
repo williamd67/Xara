@@ -1,7 +1,6 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
-import org.jetbrains.annotations.Contract;
 
 public final class Eaten extends StandardElementCollision {
     public static final ElementCollision INSTANCE = new Eaten();

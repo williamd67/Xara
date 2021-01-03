@@ -8,7 +8,6 @@ import nl.marayla.Xara.GameElements.GameElement;
 //and last addElementElementCollision(collision, element, element)
 //This ensures that default-values will not be changed
 public abstract class ElementCollisionResolver {
-    @SuppressWarnings("serial")
     public static class InvalidOrderException extends RuntimeException { }
 
     public static final ElementCollision DEFAULT = Neutral.INSTANCE;
@@ -65,5 +64,5 @@ public abstract class ElementCollisionResolver {
 
     private enum AddState { DEFAULT, ELEMENT, ELEMENT_ELEMENT }
     private AddState addState = AddState.DEFAULT;
-    private int numberOfElements;
+    private final int numberOfElements;
 }

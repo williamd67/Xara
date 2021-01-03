@@ -67,6 +67,6 @@ public class MockElementRenderer implements ElementRenderer, GameElement {
     }
 
     private GameElement element;
-    private ArrayList<Field.ConstantPosition> expectedRenderPositions = new ArrayList<>();
-    private ArrayList<Field.ConstantPosition> actualRenderPositions = new ArrayList<>();
+    private final ArrayList<Field.ConstantPosition> expectedRenderPositions = new ArrayList<>();
+    private final ArrayList<Field.ConstantPosition> actualRenderPositions = new ArrayList<>();
 }

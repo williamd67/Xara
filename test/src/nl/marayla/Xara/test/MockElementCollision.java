@@ -1,8 +1,6 @@
 package nl.marayla.Xara.test;
 
-import nl.marayla.Xara.ElementCollisions.ElementCollisionData;
 import nl.marayla.Xara.ElementCollisions.Fuse;
-import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
 
