@@ -3,7 +3,6 @@ package nl.marayla.Xara;
 import nl.marayla.Xara.GameElements.FigureGameElement;
 import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.InputHandler.ConstantMotionEvent;
-import org.jetbrains.annotations.Contract;
 
 public class Figure implements FigureInfo, FigureControl {
     public class IncreaseScore implements ElementEffect {
@@ -46,13 +45,11 @@ public class Figure implements FigureInfo, FigureControl {
         decreaseFrames = DECREASE_FRAMES;
     }
 
-    @Contract(pure = true)
     @Override
     public final boolean isInvulnerable() {
         return (invulnerableFrames > 0);
     }
 
-    @Contract(pure = true)
     @Override
     public final boolean willDecreaseSoon() {
         return (decreaseFrames < WILL_DECREASE_SOON_FRAMES);

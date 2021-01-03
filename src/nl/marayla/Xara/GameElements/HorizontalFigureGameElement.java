@@ -6,7 +6,6 @@ import nl.marayla.Xara.Renderer.Color;
 import nl.marayla.Xara.Renderer.ConstantRectangle;
 import nl.marayla.Xara.Renderer.Paint;
 import nl.marayla.Xara.Renderer.RenderData;
-import org.jetbrains.annotations.Contract;
 
 public class HorizontalFigureGameElement extends FigureGameElement {
     public HorizontalFigureGameElement(final FigureInfo figureInfo, final Field.ConstantDirection direction) {
@@ -22,7 +21,6 @@ public class HorizontalFigureGameElement extends FigureGameElement {
         renderData.getCanvas().drawRectangle(area, paint);
     }
 
-    @Contract(" -> !null")
     private Color getColor() {
         return Color.rgb(0, 128, 255);
     }

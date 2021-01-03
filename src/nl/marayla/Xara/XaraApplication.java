@@ -7,7 +7,6 @@ import nl.marayla.Xara.GameStates.GameStateId;
 import nl.marayla.Xara.GameStates.GameStateController;
 import nl.marayla.Xara.GameStates.GameStateMachine;
 import nl.marayla.Xara.Levels.Level;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -34,10 +33,8 @@ public class XaraApplication implements GameStateController {
      * @return              returns the next <code>GameState</code> following current
      * @see    GameState
      */
-    @Nullable
-    @Contract("null -> !null")
     @Override
-    public final GameState next(final GameState current) {
+    public final GameState next(@Nullable final GameState current) {
         if (current == null) {
             return new InitializeGame(XaraGameStateId.INITIALIZED);
         }
@@ -146,7 +143,6 @@ public class XaraApplication implements GameStateController {
         view = new XaraView(renderer, levelManager.createInputHandler(), new GameStateMachine(this));
     }
 
-    @Contract(pure = true)
     public final XaraView getView() {
         assert (view != null);
         return view;

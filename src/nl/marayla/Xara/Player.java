@@ -1,7 +1,5 @@
 package nl.marayla.Xara;
 
-import org.jetbrains.annotations.Contract;
-
 public class Player {
     public final void initialize() {
         xaras = START_XARAS;
@@ -27,7 +25,6 @@ public class Player {
         return xaras;
     }
 
-    @Contract(pure = true)
     public final boolean failed() {
         return xaras <= 0;
     }

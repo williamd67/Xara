@@ -13,26 +13,22 @@ import nl.marayla.Xara.ElementRenderers.ElementRenderer;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.GameElements.SimpleFigureGameElement;
 import nl.marayla.Xara.Levels.Level;
-import org.jetbrains.annotations.Contract;
 
 public class TestLevel extends Level {
     public TestLevel(final Figure figure) {
         super(figure, TestLevel.levelRendererCreator);
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean failed() {
         return false;
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean succeeded() {
         return false;
     }
 
-    @Contract(pure = true)
     @Override
     protected final int initialTime() {
         return 250;
@@ -83,19 +79,16 @@ public class TestLevel extends Level {
         return LevelElements.values();
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
         return new Field.Position(FIELD_SIZE / 2, FIELD_SIZE / 2);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMinArea() {
         return new Field.Position(1, 1);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
         return new Field.Position(FIELD_SIZE - 1, FIELD_SIZE - 1);

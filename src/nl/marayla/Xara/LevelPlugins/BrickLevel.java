@@ -19,7 +19,6 @@ import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.ElementRenderers.ElementRenderer;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.Level;
-import org.jetbrains.annotations.Contract;
 
 /*
  * TODO: move figure as one in stead of one by one -> causes holes in case of collision with ball
@@ -31,13 +30,11 @@ public class BrickLevel extends Level {
         super(figure, levelRendererCreator);
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean failed() {
         return false;
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean succeeded() {
         return false;
@@ -91,25 +88,21 @@ public class BrickLevel extends Level {
     protected void doNextFrame() {
     }
 
-    @Contract(pure = true)
     @Override
     protected final int initialTime() {
         return 100;
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
         return new Field.Position(WIDTH / 2, HEIGHT - 3);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMinArea() {
         return new Field.Position(1, 1);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
         return new Field.Position(WIDTH - 1, HEIGHT - 1);

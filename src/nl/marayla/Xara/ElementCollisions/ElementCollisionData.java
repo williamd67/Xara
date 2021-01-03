@@ -7,12 +7,10 @@ import java.util.ArrayList;
 
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
-import org.jetbrains.annotations.Contract;
 
 public class ElementCollisionData {
     public final static class List extends ArrayList<ElementCollisionData> {
         // TODO introduce pool
-        @Contract(" -> !null")
         public static List getInstance() {
             return new List();
         }

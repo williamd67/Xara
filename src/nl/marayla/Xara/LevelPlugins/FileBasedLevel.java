@@ -16,7 +16,6 @@ import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.ElementRenderers.ElementRenderer;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.Level;
-import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import javax.imageio.ImageIO;
@@ -30,19 +29,16 @@ public class FileBasedLevel extends Level {
         this.fileName = fileName;
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean failed() {
         return false;
     }
 
-    @Contract(value = " -> false", pure = true)
     @Override
     public final boolean succeeded() {
         return false;
     }
 
-    @Contract(pure = true)
     private static Field.ConstantDirection translateRGBToDirection(final int rgb) {
         switch (rgb) {
             case 0xF08000:
@@ -67,7 +63,6 @@ public class FileBasedLevel extends Level {
         }
     }
 
-    @Contract(pure = true)
     private static GameElement translateRGBToElement(final int rgb) {
         if (rgb == 0xFF0000) {
             return LevelElements.WALL_HORIZONTAL;
@@ -103,25 +98,21 @@ public class FileBasedLevel extends Level {
     protected void doNextFrame() {
     }
 
-    @Contract(pure = true)
     @Override
     protected final int initialTime() {
         return 100;
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
         return new Field.Position(Field.getSize().getWidth() / 2, Field.getSize().getHeight() / 2);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMinArea() {
         return new Field.Position(1, 1);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
         return new Field.Position(Field.getSize().getWidth() - 1, Field.getSize().getHeight() - 1);

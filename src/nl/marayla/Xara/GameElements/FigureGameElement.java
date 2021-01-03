@@ -3,7 +3,6 @@ package nl.marayla.Xara.GameElements;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.FigureInfo;
 import nl.marayla.Xara.ElementRenderers.ElementRenderer;
-import org.jetbrains.annotations.Contract;
 
 /*
  * TODO Side action
@@ -28,7 +27,6 @@ public abstract class FigureGameElement implements ElementRenderer {
         direction.update(initialDirection);
     }
 
-    @Contract(pure = true)
     public final Field.ConstantDirection getDirection() {
         return direction;
     }
