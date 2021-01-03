@@ -8,9 +8,10 @@ import nl.marayla.Xara.ElementCollisions.ElementCollisionResolver;
 import nl.marayla.Xara.ElementCollisions.Neutral;
 import nl.marayla.Xara.ElementEffects.NoEffect;
 import nl.marayla.Xara.ElementRenderers.Circle;
+import nl.marayla.Xara.ElementRenderers.Rectangle;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.Figure;
-import nl.marayla.Xara.GameElements.SimpleFigureGameElement;
+import nl.marayla.Xara.GameElements.HorizontalFigureGameElement;
 import nl.marayla.Xara.LevelRendererCreator;
 import nl.marayla.Xara.Renderer.Color;
 import nl.marayla.Xara.SimpleLevelRenderer;
@@ -20,8 +21,13 @@ import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.Level;
 import org.jetbrains.annotations.Contract;
 
-public class BouncingBallLevel extends Level {
-    public BouncingBallLevel(final Figure figure) {
+/*
+ * TODO: move figure as one in stead of one by one -> causes holes in case of collision with ball
+ * TODO: take move into account for new direction of ball
+ */
+
+public class BrickLevel extends Level {
+    public BrickLevel(final Figure figure) {
         super(figure, levelRendererCreator);
     }
 
@@ -39,19 +45,19 @@ public class BouncingBallLevel extends Level {
 
     @Override
     protected final void doInitialize() {
-        Field.initialize(SIZE, Field.Direction.STATIC);
+        Field.initialize(new Field.Size(WIDTH, HEIGHT), Field.Direction.STATIC);
 
-        Field.Position point1 = new Field.Position(0, 0);
-        Field.Position point2 = new Field.Position(0, SIZE.getHeight() - 1);
-        for (int x = 0; x < SIZE.getWidth(); x++) {
+        Field.Position point1 = new Field.Position(-1, -1);
+        Field.Position point2 = new Field.Position(-1, HEIGHT);
+        for (int x = 0; x < WIDTH + 2; x++) {
             Field.addStaticElement(LevelElements.WALL_VERTICAL, point1);
             Field.addStaticElement(LevelElements.WALL_VERTICAL, point2);
             point1.set(point1.getX() + 1, point1.getY());
             point2.set(point2.getX() + 1, point2.getY());
         }
-        point1.set(0, 1);
-        point2.set(SIZE.getWidth() - 1, 1);
-        for (int y = 1; y < (SIZE.getHeight() - 1); y++) {
+        point1.set(-1, 0);
+        point2.set(WIDTH, 0);
+        for (int y = 0; y < HEIGHT; y++) {
             Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point1);
             Field.addStaticElement(LevelElements.WALL_HORIZONTAL, point2);
             point1.set(point1.getX(), point1.getY() + 1);
@@ -59,15 +65,26 @@ public class BouncingBallLevel extends Level {
         }
         // TODO remove
         Random random = new Random(47 + new Random().nextInt(100));
-        for (int i = 0; i < 100; i++) {
-            point1.set(random.nextInt(SIZE.getWidth() - 2) + 1, random.nextInt(SIZE.getHeight() - 2) + 1);
-            Field.addStaticElement(LevelElements.BLOCK, point1);
+
+        for (int i = 0; i < 20; i++) {
+            point1.set(random.nextInt(WIDTH - 2) + 1, random.nextInt(HEIGHT - 2) + 1);
+            Field.addStaticElement(LevelElements.BRICK, point1);
         }
-        point1.set(random.nextInt(SIZE.getWidth() - 2) + 1, random.nextInt(SIZE.getHeight() - 2) + 1);
+
+        point1.set(random.nextInt(WIDTH - 2) + 1, random.nextInt(HEIGHT - 2) + 1);
         Field.addMovingElement(LevelElements.BALL, point1, Field.Direction.LEFT_DOWN);
 
-        SimpleFigureGameElement figureGameElement = new SimpleFigureGameElement(figure, Field.Direction.STATIC);
-        figure.setFigureGameElement(figureGameElement);
+        figure.setFigureGameElement(new HorizontalFigureGameElement(figure, Field.Direction.STATIC));
+        Field.Position figurePosition = new Field.Position(getFigurePosition());
+        Field.addMovingElement(
+            LevelElements.BAT_LEFT,
+            getFigurePosition(),
+            figure.getFigureGameElement().getDirection()
+        );
+        figurePosition.set(figurePosition.getX() + 1, figurePosition.getY());
+        Field.addMovingElement(LevelElements.BAT, figurePosition, figure.getFigureGameElement().getDirection());
+        figurePosition.set(figurePosition.getX() + 1, figurePosition.getY());
+        Field.addMovingElement(LevelElements.BAT_RIGHT, figurePosition, figure.getFigureGameElement().getDirection());
     }
 
     @Override
@@ -83,7 +100,7 @@ public class BouncingBallLevel extends Level {
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
-        return new Field.Position(SIZE.getWidth() / 2, SIZE.getHeight() / 2);
+        return new Field.Position(WIDTH / 2, HEIGHT - 3);
     }
 
     @Contract(" -> !null")
@@ -95,7 +112,7 @@ public class BouncingBallLevel extends Level {
     @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
-        return new Field.Position(SIZE.getWidth() - 1, SIZE.getHeight() - 1);
+        return new Field.Position(WIDTH - 1, HEIGHT - 1);
     }
 
     @Override
@@ -103,10 +120,13 @@ public class BouncingBallLevel extends Level {
         final ElementCollisionResolver resolver
     ) {
         resolver.addDefaultCollision(Neutral.INSTANCE);
-        resolver.addElementCollision(Eaten.INSTANCE, LevelElements.BLOCK);
+        resolver.addElementCollision(Eaten.INSTANCE, LevelElements.BRICK);
         resolver.addElementElementCollision(Bounce.VERTICAL, LevelElements.BALL, LevelElements.WALL_HORIZONTAL);
         resolver.addElementElementCollision(Bounce.HORIZONTAL, LevelElements.BALL, LevelElements.WALL_VERTICAL);
-        resolver.addElementElementCollision(Bounce.REVERSE, LevelElements.BALL, LevelElements.BLOCK);
+        resolver.addElementElementCollision(Bounce.REVERSE, LevelElements.BALL, LevelElements.BRICK);
+        resolver.addElementElementCollision(Bounce.REVERSE, LevelElements.BALL, LevelElements.BAT_LEFT);
+        resolver.addElementElementCollision(Bounce.HORIZONTAL, LevelElements.BALL, LevelElements.BAT);
+        resolver.addElementElementCollision(Bounce.REVERSE, LevelElements.BALL, LevelElements.BAT_RIGHT);
     }
 
     @Override
@@ -115,7 +135,7 @@ public class BouncingBallLevel extends Level {
         final GameElement dynamicElement,
         final GameElement staticElement
     ) {
-        if ((dynamicElement == LevelElements.BALL) && (staticElement == LevelElements.BLOCK)) {
+        if ((dynamicElement == LevelElements.BALL) && (staticElement == LevelElements.BRICK)) {
             return figure.new IncreaseScore(10);
         }
         return NoEffect.INSTANCE;
@@ -124,7 +144,9 @@ public class BouncingBallLevel extends Level {
     @Override
     protected final ElementRenderer createElementRenderer(final GameElement element) {
         switch ((LevelElements) element) {
-            case FIGURE:
+            case BAT_LEFT:
+            case BAT:
+            case BAT_RIGHT:
                 // TODO improve this
                 return figure.getFigureGameElement();
             case BALL:
@@ -132,8 +154,8 @@ public class BouncingBallLevel extends Level {
             case WALL_VERTICAL:
             case WALL_HORIZONTAL:
                 return new Circle(Color.rgb(164, 0, 32));
-            case BLOCK:
-                return new Circle(Color.rgb(255, 164, 32));
+            case BRICK:
+                return new Rectangle(Color.rgb(255, 164, 32));
             default:
                 throw new UnsupportedOperationException();
         }
@@ -145,13 +167,16 @@ public class BouncingBallLevel extends Level {
     }
 
     private enum LevelElements implements GameElement {
-        FIGURE,
+        BAT_LEFT,
+        BAT,
+        BAT_RIGHT,
         WALL_VERTICAL,
         WALL_HORIZONTAL,
         BALL,
-        BLOCK
+        BRICK
     }
 
     private static final LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
-    private static final Field.ConstantSize SIZE = new Field.Size(24, 20);
+    private static final int WIDTH = 20;
+    private static final int HEIGHT = 24;
 }

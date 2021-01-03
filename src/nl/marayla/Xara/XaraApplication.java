@@ -154,10 +154,10 @@ public class XaraApplication implements GameStateController {
 
     private int highScore;
 
-    private XaraView view = null;
-    private Player player = null;
-    private LevelManager levelManager = null;
-    private Renderer renderer = null;
+    private final XaraView view;
+    private final Player player;
+    private final LevelManager levelManager;
+    private final Renderer renderer;
 
     /**
      * level is current level.

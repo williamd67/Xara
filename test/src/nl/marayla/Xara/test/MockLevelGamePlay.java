@@ -47,5 +47,5 @@ class MockLevelGamePlay implements LevelGamePlay {
         }
     }
 
-    private ElementCollisionResolver collisionResolver;
+    private final ElementCollisionResolver collisionResolver;
 }

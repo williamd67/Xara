@@ -41,7 +41,7 @@ public final class Field {
      * PlacingOne
      */
     public static class PlacingOne implements PlacingAfterCollision {
-        protected final class PlacingData {
+        protected static final class PlacingData {
             public PlacingData(final int index, final GameElement element, final ConstantDirection direction) {
                 this.index = index;
                 this.element = element;
@@ -60,9 +60,9 @@ public final class Field {
                 return direction;
             }
 
-            private int index;
-            private GameElement element;
-            private ConstantDirection direction;
+            private final int index;
+            private final GameElement element;
+            private final ConstantDirection direction;
         }
 
         public PlacingOne(
@@ -79,7 +79,7 @@ public final class Field {
             addElement(placingData.getIndex(), placingData.getElement(), placingData.getDirection());
         }
 
-        private PlacingData placingData;
+        private final PlacingData placingData;
     }
 
     /*
@@ -107,7 +107,7 @@ public final class Field {
             addElement(placingData.getIndex(), placingData.getElement(), placingData.getDirection());
         }
 
-        private PlacingData placingData;
+        private final PlacingData placingData;
     }
 
     /*
@@ -297,24 +297,24 @@ public final class Field {
         @Contract(pure = true)
         @Override
         public final ConstantDirection reverse() {
-            return determineDirectionBasedOnDeltaXandDeltaY(-deltaX, -deltaY);
+            return determineDirectionBasedOnDeltaXAndDeltaY(-deltaX, -deltaY);
         }
 
         @Contract(pure = true)
         @Override
         public final ConstantDirection reverseX() {
-            return determineDirectionBasedOnDeltaXandDeltaY(-deltaX, deltaY);
+            return determineDirectionBasedOnDeltaXAndDeltaY(-deltaX, deltaY);
         }
 
         @Contract(pure = true)
         @Override
         public final ConstantDirection reverseY() {
-            return determineDirectionBasedOnDeltaXandDeltaY(deltaX, -deltaY);
+            return determineDirectionBasedOnDeltaXAndDeltaY(deltaX, -deltaY);
         }
 
         @Override
         public final ConstantDirection combine(final ConstantDirection direction) {
-            return determineDirectionBasedOnDeltaXandDeltaY(
+            return determineDirectionBasedOnDeltaXAndDeltaY(
                 deltaX + direction.getDeltaX(),
                 deltaY + direction.getDeltaY()
             );
@@ -322,7 +322,7 @@ public final class Field {
 
         @Override
         public final ConstantDirection extract(final ConstantDirection direction) {
-            return determineDirectionBasedOnDeltaXandDeltaY(
+            return determineDirectionBasedOnDeltaXAndDeltaY(
                 (deltaX == direction.getDeltaX()) ? 0 : deltaX, // if x-direction equal extract else do not change
                 (deltaY == direction.getDeltaY()) ? 0 : deltaY  // if y-direction equal extract else do not change
             );
@@ -330,7 +330,7 @@ public final class Field {
 
         @Override
         public final ConstantDirection perpendicular() {
-            return determineDirectionBasedOnDeltaXandDeltaY(deltaY, -deltaX);
+            return determineDirectionBasedOnDeltaXAndDeltaY(deltaY, -deltaX);
         }
 
         Direction(final int deltaX, final int deltaY) {
@@ -342,7 +342,7 @@ public final class Field {
         }
 
         @Contract(pure = true)
-        private static Direction determineDirectionBasedOnDeltaXandDeltaY(final int deltaX, final int deltaY) {
+        private static Direction determineDirectionBasedOnDeltaXAndDeltaY(final int deltaX, final int deltaY) {
             if (deltaX < 0) { // x => LEFT
                 if (deltaY < 0) { // y  => UP
                     return LEFT_UP;
@@ -383,10 +383,10 @@ public final class Field {
     }
 
     /*
-     * UpdateableDirection
+     * UpdatableDirection
      */
-    public static class UpdateableDirection implements ConstantDirection {
-        public UpdateableDirection(ConstantDirection direction) {
+    public static class UpdatableDirection implements ConstantDirection {
+        public UpdatableDirection(ConstantDirection direction) {
             this.direction = direction;
         }
 
@@ -434,7 +434,7 @@ public final class Field {
             this.direction = direction;
         }
 
-        private ConstantDirection direction = Direction.STATIC;
+        private ConstantDirection direction;
     }
 
     public interface ColorToElement {
@@ -723,7 +723,7 @@ public final class Field {
             return direction;
         }
 
-        private Field.ConstantDirection direction;
+        private final Field.ConstantDirection direction;
     }
 
     private static class NotConnectedMovingCell extends MovingCell {
@@ -750,12 +750,12 @@ public final class Field {
             return connections;
         }
 
-        private int[] connections;
+        private final int[] connections;
     }
 
     private static GameElement[] cells;
-    private static Map<Integer, ConstantMovingCell> movingCells = new TreeMap<>();
-    private static Size size = new Size(0, 0);
+    private static final Map<Integer, ConstantMovingCell> movingCells = new TreeMap<>();
+    private static final Size size = new Size(0, 0);
     private static ConstantDirection direction;
     private static ConstantPosition startPositionVisibleArea;
     private static ConstantDirection injectionLineDirection;
@@ -808,6 +808,20 @@ class CollisionHandler {
         finally {
             ElementCollisionData.releaseInstance(elementCollisionData);
         }
+    }
+
+    private static void executeHasConnections(
+        final LinkedList<Integer> collisions,
+        final LevelGamePlay levelGamePlay,
+        final ElementCollisionData mainElementCollisionData
+    ) {
+        if (hasConnection(mainElementCollisionData)) {
+            final int[] connections = mainElementCollisionData.getConnections();
+            for (int i = 0; i < connections.length; i++) {
+// TODO:
+            }
+        }
+        executeMovesBeforeCollision(collisions, levelGamePlay, mainElementCollisionData);
     }
 
     private static void executeMovesBeforeCollision(
@@ -1003,6 +1017,10 @@ class CollisionHandler {
     ) {
         Field.removeElement(elementCollisionData.getIndex());
         Field.addElement(elementCollisionData.getIndex(), elementCollisionData.getElement(), direction);
+    }
+
+    private static boolean hasConnection(final ElementCollisionData elementCollisionData) {
+        return elementCollisionData.getConnections().length > 0;
     }
 
     private static boolean movesBeforeCollision(

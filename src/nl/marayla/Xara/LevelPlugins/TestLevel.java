@@ -106,7 +106,7 @@ public class TestLevel extends Level {
         BALL
     }
 
-    private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
+    private static final LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
 
     protected static final int FIELD_SIZE = 15;
 }

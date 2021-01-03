@@ -1,20 +1,19 @@
 package nl.marayla.Xara.GameElements;
 
 import nl.marayla.Xara.Field;
-import nl.marayla.Xara.Field.Direction.*;
 import nl.marayla.Xara.FigureInfo;
 import nl.marayla.Xara.ElementRenderers.ElementRenderer;
 import org.jetbrains.annotations.Contract;
 
 /*
  * TODO Side action
- *  levelGamePlay.decreaseLifes();
+ *  levelGamePlay.decreaseLife();
  */
 public abstract class FigureGameElement implements ElementRenderer {
     public FigureGameElement(final FigureInfo figureInfo, Field.ConstantDirection direction) {
         this.figureInfo = figureInfo;
         this.initialDirection = direction;
-        this.direction = new Field.UpdateableDirection(direction);
+        this.direction = new Field.UpdatableDirection(direction);
     }
 
     public void moveLeft() {
@@ -38,7 +37,7 @@ public abstract class FigureGameElement implements ElementRenderer {
         return figureInfo;
     }
 
-    private FigureInfo figureInfo;
-    private Field.ConstantDirection initialDirection;
-    private Field.UpdateableDirection direction;
+    private final FigureInfo figureInfo;
+    private final Field.ConstantDirection initialDirection;
+    private final Field.UpdatableDirection direction;
 }

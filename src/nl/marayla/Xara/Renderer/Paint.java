@@ -21,6 +21,6 @@ public class Paint {
     }
 
     private Color color;
-    private Flag flag = Flag.DITHER_FLAG;
+    private final Flag flag;
     private Style style = Style.FILL;
 }

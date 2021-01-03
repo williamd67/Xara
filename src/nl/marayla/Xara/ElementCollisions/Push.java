@@ -1,7 +1,6 @@
 package nl.marayla.Xara.ElementCollisions;
 
 import nl.marayla.Xara.Field;
-import org.jetbrains.annotations.Contract;
 
 // TODO Ensure that push does not push elements on top of each other
 public final class Push extends StandardElementCollision {

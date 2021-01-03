@@ -3,10 +3,10 @@ package nl.marayla.Xara.test;
 /* TODO Enable
 class MockLevel extends Level {
     @Override
-    public void decreaseLifes() {
+    public void decreaseLife() {
     }
     @Override
-    public void increaseLifes() {
+    public void increaseLife() {
     }
     @Override
     public void decreaseBonus(final int decrease) {

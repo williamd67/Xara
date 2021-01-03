@@ -16,7 +16,7 @@ public class Figure implements FigureInfo, FigureControl {
             player.increaseScore(value);
         }
 
-        private int value;
+        private final int value;
     }
 
     public class IncreaseLife implements ElementEffect {
@@ -119,9 +119,9 @@ public class Figure implements FigureInfo, FigureControl {
         }
     }
 
-    private Field.Position minArea = new Field.Position(0, 0); // TODO Reintroduce these values
-    private Field.Position maxArea = new Field.Position(0, 0); // TODO Reintroduce these values
-    private Player player;
+    private final Field.Position minArea = new Field.Position(0, 0); // TODO Reintroduce these values
+    private final Field.Position maxArea = new Field.Position(0, 0); // TODO Reintroduce these values
+    private final Player player;
     private FigureGameElement figureGameElement; // TODO Create array of figureGameElements
     private int decreaseFrames;
     private int invulnerableFrames;

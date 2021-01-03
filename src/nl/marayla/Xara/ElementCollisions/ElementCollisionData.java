@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import nl.marayla.Xara.Field;
 import nl.marayla.Xara.GameElements.GameElement;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 
 public class ElementCollisionData {
     public final static class List extends ArrayList<ElementCollisionData> {
@@ -47,7 +46,7 @@ public class ElementCollisionData {
             data.reset();
             pool[poolFree++] = data;
         }
-        // else do nothing; carbage collector will clean-up
+        // else do nothing; garbage collector will clean-up
     }
 
     public final int getIndex() {
@@ -138,7 +137,7 @@ public class ElementCollisionData {
 
     private static final int INITIAL_POOL_SIZE = 10;
     private static int poolFree = INITIAL_POOL_SIZE;
-    private static ElementCollisionData[] pool;
+    private static final ElementCollisionData[] pool;
     static {
         pool = new ElementCollisionData[INITIAL_POOL_SIZE];
         for (int i = 0; i < INITIAL_POOL_SIZE; i++) {

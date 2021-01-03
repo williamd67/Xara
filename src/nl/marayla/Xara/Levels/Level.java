@@ -116,7 +116,7 @@ public abstract class Level implements LevelGamePlay {
     }
     private int time;
     protected Figure figure; // TODO make private again
-    private LevelRenderer renderer;
+    private final LevelRenderer renderer;
     private ElementRenderer[] elementRenderers;
     private ElementCollisionResolver elementCollisionResolver;
 }

@@ -15,5 +15,5 @@ public abstract class GameState {
     public abstract void run();
     public abstract boolean isFinished();
 
-    private GameStateId id;
+    private final GameStateId id;
 }

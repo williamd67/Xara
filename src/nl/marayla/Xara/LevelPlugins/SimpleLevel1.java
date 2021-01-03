@@ -176,21 +176,23 @@ public class SimpleLevel1 extends Level {
         public BonusEffect(final int value) {
             this.value = value;
         }
+
         @Override
         public void execute() {
             bonuses -= value;
         }
-        private int value;
+
+        private final int value;
     }
 
-    private static LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
+    private static final LevelRendererCreator levelRendererCreator = (figureInfo) -> new SimpleLevelRenderer();
 
-    private static Field.ConstantSize SIZE = new Field.Size(24, 20);
-    private static Field.ConstantDirection DIRECTION = Field.Direction.DOWN;
+    private static final Field.ConstantSize SIZE = new Field.Size(24, 20);
+    private static final Field.ConstantDirection DIRECTION = Field.Direction.DOWN;
 
-    private ElementEffect frameEffect;
+    private final ElementEffect frameEffect;
     private int bonuses;
-    private Random random = new Random(45);
+    private final Random random = new Random(45);
     private static final int XARA_HEAD_Y = 4;
     private CompositeElementEffect bonusEffect;
     private CompositeElementEffect superBonusEffect;

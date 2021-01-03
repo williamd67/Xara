@@ -5,7 +5,6 @@ import nl.marayla.Xara.InputHandler.ConstantMotionEvent;
 import nl.marayla.Xara.InputHandler.InputHandler;
 import nl.marayla.Xara.Renderer.Canvas;
 import nl.marayla.Xara.Renderer.Renderer;
-import org.jetbrains.annotations.Contract;
 
 public class XaraView {
     public XaraView(
@@ -35,7 +34,7 @@ public class XaraView {
         inputHandler.handleEvent(event);
     }
 
-    private Renderer renderer = null;
-    private InputHandler inputHandler = null;
-    private GameStateMachine gameStateMachine = null;
+    private final Renderer renderer;
+    private final InputHandler inputHandler;
+    private final GameStateMachine gameStateMachine;
 }

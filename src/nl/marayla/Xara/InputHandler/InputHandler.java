@@ -11,5 +11,5 @@ public class InputHandler {
         this.figureControl.handleMotionEvent(event);
     }
 
-    private FigureControl figureControl;
+    private final FigureControl figureControl;
  }

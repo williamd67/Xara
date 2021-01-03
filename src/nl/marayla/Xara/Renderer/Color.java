@@ -10,6 +10,7 @@ public class Color {
 
     public Color() {
     }
+
     public Color(int red, int green, int blue) {
         assert ((red >= 0) && (red <= 255));
         assert ((green >= 0) && (green <= 255));
@@ -20,13 +21,24 @@ public class Color {
         this.blue = blue;
     }
 
-    public final int getRed() { return red; }
-    public final int getGreen() { return green; }
-    public final int getBlue() { return blue; }
-    public final double getAplha() { return alpha; }
+    public final int getRed() {
+        return red;
+    }
+
+    public final int getGreen() {
+        return green;
+    }
+
+    public final int getBlue() {
+        return blue;
+    }
+
+    public final double getAlpha() {
+        return alpha;
+    }
 
     private int red = 0;
     private int green = 0;
     private int blue = 0;
-    private double alpha = 1.0;
+    private final double alpha = 1.0;
 }

@@ -1,17 +1,13 @@
+/*
+ * Design:
+ *   State contains:
+ *       timer
+ *       activeGameState
+ */
 package nl.marayla.Xara.GameStates;
-
-/**
-*
-* Design:
-*   State contains:
-*       timer
-*       activeGameState
-*/
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import nl.marayla.Xara.Platform.XaraLog;
 
 public class GameStateMachine extends TimerTask {
     public GameStateMachine(final GameStateController controller) {
@@ -42,9 +38,9 @@ public class GameStateMachine extends TimerTask {
         return next;
     }
 
-    private Timer timer;
+    private final Timer timer;
     private GameState active;
-    private GameStateController controller;
+    private final GameStateController controller;
 
     private static final int FRAME_TIME = 150; // ms
 }

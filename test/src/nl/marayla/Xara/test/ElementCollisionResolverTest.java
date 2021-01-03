@@ -1,5 +1,6 @@
 package nl.marayla.Xara.test;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import nl.marayla.Xara.ElementCollisions.Bounce;
@@ -25,16 +26,12 @@ public abstract class ElementCollisionResolverTest {
         collisionResolver = createCollisionResolver(nrOfElements);
 
         expectedCollisions = new ElementCollision[nrOfElements * nrOfElements];
-        for (int i = 0; i < expectedCollisions.length; i++) {
-            expectedCollisions[i] = ElementCollisionResolver.DEFAULT;
-        }
+        Arrays.fill(expectedCollisions, ElementCollisionResolver.DEFAULT);
     }
 
     public final void addDefaultCollision(final ElementCollision elementCollision) {
         collisionResolver.addDefaultCollision(elementCollision);
-        for (int i = 0; i < expectedCollisions.length; i++) {
-            expectedCollisions[i] = elementCollision;
-        }
+        Arrays.fill(expectedCollisions, elementCollision);
     }
 
     public final void addElementCollision(
@@ -440,6 +437,6 @@ public abstract class ElementCollisionResolverTest {
 
     private ElementCollisionResolver collisionResolver;
     private ElementCollision[] expectedCollisions;
-    private Random random = new Random(45);
+    private final Random random = new Random(45);
     private static final int REPEATS = 7;
 }
