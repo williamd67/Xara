@@ -1,7 +1,5 @@
 package nl.marayla.Xara.Renderer;
 
-import org.jetbrains.annotations.Contract;
-
 public class Rectangle implements ConstantRectangle {
     public Rectangle() {
         set(0, 0, 0, 0);
@@ -27,22 +25,16 @@ public class Rectangle implements ConstantRectangle {
     public final double getRight() { return right; }
     public final double getBottom() { return bottom; }
 
-    @Contract(pure = true)
     public final double width() { return right - left; }
 
-    @Contract(pure = true)
     public final double height() { return bottom - top; }
 
-    @Contract(pure = true)
     public final double centerX() { return (left + right) / 2; }
 
-    @Contract(pure = true)
     public final double centerY() { return (top + bottom) / 2; }
 
-    @Contract(" -> !null")
     public final ConstantPoint center() { return new Point(centerX(), centerY()); }
 
-    @Contract(pure = true)
     @Override
     public final boolean equals(final Object o) {
         if (this == o) {
@@ -60,13 +52,11 @@ public class Rectangle implements ConstantRectangle {
         );
     }
 
-    @Contract(" -> fail")
     @Override
     public final int hashCode() {
         throw new UnsupportedOperationException();
     }
 
-    @Contract(pure = true)
     @Override
     public final String toString() {
         return "Rectangle (" + left + ", " + top + ", " + right + ", " + bottom + ")";

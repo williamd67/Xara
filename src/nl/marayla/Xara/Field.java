@@ -11,7 +11,6 @@ import nl.marayla.Xara.ElementEffects.ElementEffect;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.Levels.LevelGamePlay;
 import nl.marayla.Xara.Renderer.RenderData;
-import org.jetbrains.annotations.Contract;
 
 // Attributes of Field:
 //  Contains 2D-array of cells
@@ -151,7 +150,6 @@ public final class Field {
             height = other.getHeight();
         }
 
-        @Contract(pure = true)
         @Override
         public final boolean equals(final Object o) {
             if (this == o) {
@@ -164,7 +162,6 @@ public final class Field {
             return ((width == other.getWidth()) && (height == other.getHeight()));
         }
 
-        @Contract(" -> fail")
         @Override
         public final int hashCode() {
             throw new UnsupportedOperationException();
@@ -240,7 +237,6 @@ public final class Field {
             return 31 * x + y;
         }
 
-        @Contract(pure = true)
         public final String toString() {
             return "Field.Position (" + x + ", " + y + ")";
         }
@@ -294,19 +290,16 @@ public final class Field {
             return deltaY;
         }
 
-        @Contract(pure = true)
         @Override
         public final ConstantDirection reverse() {
             return determineDirectionBasedOnDeltaXAndDeltaY(-deltaX, -deltaY);
         }
 
-        @Contract(pure = true)
         @Override
         public final ConstantDirection reverseX() {
             return determineDirectionBasedOnDeltaXAndDeltaY(-deltaX, deltaY);
         }
 
-        @Contract(pure = true)
         @Override
         public final ConstantDirection reverseY() {
             return determineDirectionBasedOnDeltaXAndDeltaY(deltaX, -deltaY);
@@ -341,7 +334,6 @@ public final class Field {
             this.deltaY = deltaY;
         }
 
-        @Contract(pure = true)
         private static Direction determineDirectionBasedOnDeltaXAndDeltaY(final int deltaX, final int deltaY) {
             if (deltaX < 0) { // x => LEFT
                 if (deltaY < 0) { // y  => UP
@@ -480,12 +472,10 @@ public final class Field {
     /**
      * FieldCells interface
      */
-    @Contract(pure = true)
     public static GameElement getElement(final int index) {
         return cells[index];
     }
 
-    @Contract(pure = true)
     public static ConstantSize getSize() {
         return size;
     }
@@ -640,7 +630,6 @@ public final class Field {
         return doMove(start, distance, size.getHeight());
     }
 
-    @Contract(pure = true)
     private static int doMove(final int start, final int distance, final int border) {
         int result = start + distance;
         if (result < 0) {

@@ -16,7 +16,6 @@ import nl.marayla.Xara.ElementRenderers.ElementRenderer;
 import nl.marayla.Xara.GameElements.GameElement;
 import nl.marayla.Xara.GameElements.SimpleFigureGameElement;
 import nl.marayla.Xara.Levels.Level;
-import org.jetbrains.annotations.Contract;
 
 public class SimpleLevel1 extends Level {
     public SimpleLevel1(final Figure figure) {
@@ -34,7 +33,6 @@ public class SimpleLevel1 extends Level {
         return (getBonuses() < 0);
     }
 
-    @Contract(pure = true)
     @Override
     protected final int initialTime() {
         return 250;
@@ -75,20 +73,17 @@ public class SimpleLevel1 extends Level {
         return bonuses;
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigurePosition() {
         return new Field.Position(SIZE.getWidth() / 2, SIZE.getHeight() - XARA_HEAD_Y);
     }
 
-    @Contract(" -> !null")
     @Override
     protected final Field.ConstantPosition getFigureMinArea() {
         return new Field.Position(0, SIZE.getHeight() - XARA_HEAD_Y);
     }
 
-    @Contract(" -> !null")
-    @Override
+   @Override
     protected final Field.ConstantPosition getFigureMaxArea() {
         return new Field.Position(SIZE.getWidth(), SIZE.getHeight() - XARA_HEAD_Y);
     }
